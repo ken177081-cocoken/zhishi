@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>星星學園</title>
 <meta name="apple-mobile-web-app-title" content="星星學園">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-512.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Huninn&family=LXGW+WenKai+TC:wght@400;700&display=swap">
@@ -594,6 +596,8 @@ body.battle header{display:none}
 .sostage.open .scard{opacity:1;transform:none}
 .scin{position:relative;width:100%;height:100%;border-radius:17px;overflow:hidden;background:linear-gradient(#FFFDF6,#F6E8CC)}
 .scimg{position:absolute;left:0;right:0;top:24px;height:196px;display:flex;justify-content:center;z-index:1}
+.scard:not(.ready) .scimg,.scard:not(.ready) .scname{visibility:hidden}
+.scard:not(.done) .slv{display:none}
 .scimg .fig{width:auto!important;height:100%!important;aspect-ratio:100/112}
 .scname{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-weight:800;font-size:17px;color:#4A3426;opacity:0;transform:translateY(8px);transition:all .5s .2s;z-index:1}
 .scard.done .scname{opacity:1;transform:none}
@@ -668,6 +672,19 @@ body.battle #sceneBg{filter:blur(18px) saturate(1.05)}
 @keyframes fxHeart{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.05);opacity:1}100%{transform:scale(1.15) translateY(-40px);opacity:0}}
 @keyframes fxConf{0%{transform:scale(.2);opacity:1}70%{opacity:1}100%{transform:scale(1.4);opacity:0}}
 @keyframes fxRays{to{transform:rotate(360deg)}}
+
+/* ===== 對比與截字修正 ===== */
+:root{--sage:#5F8A58;--good-ink:#4E7A48}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--sage:#557F4F;--good-ink:#9FD196}}
+:root[data-theme="dark"]{--sage:#557F4F;--good-ink:#9FD196}
+body.battle{--sage:#5F8A58;--good-ink:#4E7A48}
+.brow b{color:var(--good-ink)}
+.stage.boss:not(.locked){color:#4A3426}
+.stage.boss:not(.locked) .st-desc,.stage.boss:not(.locked) .tag{color:#8A6A55}
+.stage.boss:not(.locked) .star.off{stroke:#B59A84}
+.pl-name{flex-wrap:wrap;row-gap:1px}
+.pl-name b{overflow:visible;text-overflow:clip;white-space:nowrap;font-size:clamp(13px,3.7vw,15px)}
+.pl-tag{white-space:nowrap}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1266,8 +1283,14 @@ function startLevel(i){G={L:LEVELS[i],kind:'math',tag:`第 ${i+1} 關・${LEVELS
 function makeP({op,a,b}){const res=op==='+'?a+b:a-b,A=digits(a),B=digits(b),R=digits(res),n=Math.max(A.length,B.length,R.length)+1,c=[0];
  for(let p=0;p<n;p++)c[p+1]=op==='+'&&((A[p]||0)+(B[p]||0)+c[p])>=10?1:0;
  return{op,a,b,res,A,B,R,n,c,w:A.slice(),entered:[],carry:{},fresh:new Set(),p:0,mistakes:0,colWrong:0,done:false}}
+function mathDiff(q){const A=digits(q.a),B=digits(q.b);let s=0;
+ if(q.op==='+'){let c=0;for(let i=0;i<Math.max(A.length,B.length);i++){const v=(A[i]||0)+(B[i]||0)+c;c=v>=10?1:0;s+=c}}
+ else{let br=0;for(let i=0;i<A.length;i++){const top=A[i]-br;if(top<(B[i]||0)){s+=1;if(A[i+1]===0)s+=1.5;br=1}else br=0}}
+ return s+String(q.a).length*.3}
 function nextProblem(){
- let q,tries=0;do{q=LEVELS[G.li].gen();tries++}while(G.last&&q.a===G.last.a&&q.b===G.last.b&&tries<20);G.last=q;
+ let q,tries=0;const hard=G.L&&G.L.mult>=2;G.hard=hard;
+ if(hard){/* 加倍關卡：同一種題型多出幾題，挑進位／借位最多的 */let best=null,bs=-1;for(let k=0;k<10;k++){const c=LEVELS[G.li].gen();if(G.last&&c.a===G.last.a&&c.b===G.last.b)continue;const sc=mathDiff(c)+Math.random()*.3;if(sc>bs){bs=sc;best=c}}q=best||LEVELS[G.li].gen()}
+ else do{q=LEVELS[G.li].gen();tries++}while(G.last&&q.a===G.last.a&&q.b===G.last.b&&tries<20);G.last=q;
  P=makeP(q);P.lucky=G.q===G.lucky;
  $('board').classList.remove('solved');$('board').classList.toggle('lucky',P.lucky);$('luckyTag').hidden=!P.lucky;
  $('pad').hidden=false;$('nextBtn').hidden=true;
@@ -1505,7 +1528,13 @@ function zyWrong(r){const base=r.replace(/[ˊˇˋ˙]/g,''),tones=['','ˊ','ˇ','
  for(const [a,b] of shuffle(ZY_SIM)){if(out.size>=4)break;if(base.includes(a))out.add(base.replace(a,b)+cur);else if(base.includes(b))out.add(base.replace(b,a)+cur)}
  for(const t of tones){if(out.size>=4)break;const x=base.replace(/ㄧ|ㄨ/,'')+t;if(x&&x!==r)out.add(x)}
  out.delete(r);return shuffle([...out]).slice(0,3)}
-function cnMake(lessons){const pick=arr=>arr&&arr.length?arr[rnd(0,arr.length-1)]:null;
+const STK={"一":1,"七":2,"三":3,"上":3,"下":3,"不":4,"丫":3,"中":4,"主":5,"久":3,"乖":8,"九":2,"乾":11,"了":2,"二":2,"五":4,"交":6,"享":8,"亮":9,"人":2,"什":4,"今":4,"介":4,"仔":5,"他":5,"以":4,"件":6,"伸":7,"但":7,"位":7,"住":7,"作":7,"你":7,"來":8,"便":9,"保":9,"個":10,"們":10,"倒":10,"候":10,"假":11,"做":11,"停":11,"傍":12,"傘":12,"備":12,"傷":13,"傾":13,"像":13,"充":6,"先":6,"光":6,"兒":8,"兔":8,"全":6,"兩":8,"八":2,"公":4,"六":4,"具":8,"冬":5,"冰":6,"冷":7,"出":5,"分":4,"划":6,"別":7,"到":8,"刷":8,"刻":8,"前":9,"力":2,"加":5,"努":7,"動":11,"包":5,"匹":4,"十":2,"南":9,"卡":5,"印":5,"卻":9,"原":10,"去":5,"又":2,"友":4,"叢":18,"口":3,"只":5,"叫":5,"可":5,"右":5,"吃":6,"各":6,"同":6,"名":6,"向":6,"吧":7,"吹":7,"呱":8,"味":8,"和":8,"咪":9,"哥":10,"哪":9,"唱":11,"問":11,"喔":12,"喜":12,"喝":12,"嗎":13,"嘟":13,"嘴":16,"四":5,"回":6,"因":6,"國":11,"園":13,"圓":13,"團":14,"土":3,"在":6,"地":6,"坐":7,"城":9,"堆":11,"堡":12,"報":12,"場":12,"塘":13,"夏":10,"夕":3,"外":5,"多":6,"夜":8,"大":3,"天":4,"太":4,"失":5,"奇":8,"套":10,"奶":5,"好":6,"如":6,"妖":7,"妹":8,"始":8,"姐":8,"媽":13,"子":3,"字":6,"學":16,"安":6,"完":7,"客":9,"室":9,"家":10,"密":11,"寫":15,"對":14,"小":3,"就":12,"尾":7,"屋":9,"山":3,"工":3,"左":5,"己":3,"巴":4,"市":5,"布":5,"希":7,"師":10,"幫":17,"平":5,"年":6,"幾":12,"底":8,"廚":15,"弟":7,"張":11,"彈":15,"形":7,"彩":11,"影":15,"很":9,"後":9,"得":11,"從":11,"心":4,"快":7,"念":8,"怎":9,"怪":8,"情":11,"想":13,"意":13,"愛":13,"慌":12,"慢":14,"成":6,"我":7,"戲":17,"戶":4,"房":8,"扇":10,"手":4,"才":3,"打":5,"把":7,"抓":7,"拉":8,"拿":10,"指":9,"挖":9,"捉":10,"捲":11,"掉":11,"掌":12,"排":11,"掛":11,"接":11,"推":11,"搖":13,"搶":13,"撐":15,"撥":15,"播":15,"操":16,"擔":16,"擠":17,"收":6,"改":7,"放":8,"教":11,"散":12,"整":16,"數":15,"新":13,"方":4,"旁":10,"日":4,"早":6,"明":8,"星":9,"春":9,"是":9,"時":10,"晚":11,"晴":12,"暑":12,"暗":13,"曲":6,"更":7,"書":10,"最":12,"會":13,"月":4,"有":6,"朋":8,"服":8,"朗":10,"望":11,"期":12,"木":4,"本":5,"朵":6,"材":7,"東":8,"林":8,"果":8,"校":10,"案":10,"條":10,"棉":12,"森":12,"棵":12,"楚":13,"業":13,"樂":15,"樣":15,"樹":16,"橫":16,"次":6,"歌":14,"歡":21,"正":5,"步":7,"歲":13,"每":7,"比":4,"毛":4,"氣":10,"水":4,"汁":5,"池":6,"沖":7,"沙":7,"法":8,"泡":8,"波":8,"注":8,"洗":9,"洞":9,"活":9,"浮":10,"浴":10,"海":10,"消":10,"涼":11,"淚":11,"淡":11,"清":11,"減":12,"游":12,"湯":12,"準":13,"溪":13,"滿":14,"漂":14,"澡":16,"灘":22,"火":4,"為":9,"烏":10,"然":12,"照":13,"煮":12,"熟":15,"熱":15,"燈":16,"燙":16,"爐":20,"爸":8,"爺":12,"牆":17,"片":4,"牙":4,"牛":4,"特":10,"狗":8,"猜":11,"王":4,"玩":8,"現":11,"球":11,"理":11,"琴":12,"瓜":5,"生":5,"用":5,"留":10,"畫":12,"異":11,"當":13,"發":12,"白":5,"百":6,"的":8,"皮":5,"盆":9,"盒":11,"盡":14,"盤":15,"目":5,"直":8,"看":9,"真":10,"眼":11,"睛":13,"睡":13,"知":8,"石":5,"碗":13,"祖":9,"祝":9,"秋":9,"種":14,"空":8,"穿":9,"突":9,"窗":12,"立":5,"站":10,"竟":11,"童":12,"竹":6,"第":11,"筆":12,"等":12,"筒":12,"答":12,"箱":15,"節":13,"米":6,"粄":10,"粒":11,"糕":16,"糖":16,"紅":9,"紙":10,"細":11,"紹":11,"給":12,"綠":14,"緊":14,"線":15,"練":15,"美":9,"習":11,"翻":18,"老":6,"考":6,"耳":6,"聚":14,"聞":14,"聲":17,"聽":22,"肚":7,"育":8,"背":9,"胖":9,"能":10,"脖":11,"腦":13,"腳":13,"臉":17,"臣":6,"自":6,"臺":14,"舉":16,"舒":12,"舞":14,"船":11,"色":6,"艾":5,"花":7,"苔":8,"草":9,"菜":11,"葉":12,"著":11,"蒸":13,"蔔":14,"蔬":15,"蕉":15,"藏":17,"蘿":22,"虹":9,"蛋":11,"蛙":12,"蝦":15,"螃":16,"蟆":16,"蟹":19,"衣":6,"表":8,"袋":11,"袖":10,"裝":13,"裡":12,"西":6,"要":9,"見":7,"視":11,"覺":20,"角":7,"言":7,"計":9,"記":10,"設":11,"詠":12,"試":13,"詩":13,"話":13,"認":14,"語":14,"說":14,"課":15,"請":15,"謎":16,"證":19,"識":19,"護":20,"讀":22,"變":23,"讓":24,"豬":15,"貓":15,"買":12,"賽":17,"走":7,"起":10,"越":12,"趕":14,"趣":15,"跌":12,"跑":12,"跟":13,"路":13,"跳":13,"踏":15,"身":7,"躲":13,"車":7,"軟":11,"轉":18,"辦":16,"近":7,"迷":9,"退":9,"這":10,"通":10,"進":11,"遊":12,"運":12,"過":11,"道":12,"遠":13,"遲":15,"還":16,"邊":18,"那":6,"郊":8,"都":10,"鄉":11,"鉛":13,"錯":16,"鐘":20,"長":8,"門":8,"閃":10,"開":12,"閒":12,"間":12,"闖":18,"附":7,"陣":9,"陽":11,"隊":11,"隻":10,"雞":18,"離":18,"難":19,"雨":8,"雲":12,"電":13,"青":8,"靜":16,"靠":15,"面":9,"鞋":15,"音":9,"響":20,"頂":11,"項":12,"領":14,"頭":16,"頸":16,"顆":17,"題":18,"顏":18,"風":9,"颳":15,"飄":20,"飛":9,"食":9,"飯":12,"飽":13,"餅":14,"餐":16,"首":9,"香":9,"馬":10,"騎":18,"驚":22,"體":22,"鬧":15,"魚":11,"鳥":11,"鴨":16,"鵝":18,"鹿":11,"麗":19,"麼":14,"黃":12,"黏":17,"點":17,"齊":14};
+const stkOf=w=>[...String(w||'')].reduce((t,c)=>t+(STK[c]||8),0);
+function cnMake(lessons,hard){const pick0=arr=>arr&&arr.length?arr[rnd(0,arr.length-1)]:null;
+ /* 加倍關卡：同一份題庫裡，只從筆畫最多的前 40% 挑 */
+ const SC=x=>x.c?stkOf(x.c):stkOf(x.w);
+ const pick=arr=>{if(!hard||!arr||!arr.length||arr===lessons)return pick0(arr);const so=arr.slice().sort((a,b)=>SC(b)-SC(a));return so[rnd(0,Math.max(3,Math.ceil(so.length*.4))-1)]||pick0(arr)};
+ if(hard){const M={words:[],read:[],chars:[],sents:[]};lessons.forEach(b=>{for(const k in M)M[k].push(...(b[k]||[]))});lessons=[M]}
  const mk={fill:b=>{const w=pick(b.words);return w&&{t:'fill',ans:[w.w],zy:zyWord(w.w),text:w.ex}},
   blank:b=>{const w=pick(b.words);return w&&{t:'blank',ans:[w.w,...(w.alt||[])],zy:zyWord(w.w),text:w.ex}},
   zy:b=>{const w=pick(b.words);return w&&{t:'zy',ans:[w.w],zy:zyWord(w.w)}},
@@ -1532,7 +1561,7 @@ let C=null,CQ=null;
 function startCn(i){const all=CN_LV(),L=all[i];
  G={li:i,L,kind:'cn',tag:`國語・${L.name}`,q:0,base:[],mist:0,bonus:[],lucky:rnd(0,CN_N-1),ch:!!S.challenge,
   restart:()=>startCn(i),next:i+1<all.length?()=>startCn(i+1):null};
- C={qs:cnMake(L.lessons)};
+ C={qs:cnMake(L.lessons,L.mult>=2)};G.hard=L.mult>=2;
  $('cnTitle').textContent=`國語・${L.name}${G.ch?'・挑戰模式':''}`;
  show('cnplay');cnNext()}
 function cnDots(){$('cnDots').innerHTML=Array.from({length:CN_N},(_,i)=>{const s=G.base[i];return `<div class="dot ${s===3?'ok':s?'ok2':i===G.q?'now':''} ${i===G.lucky?'luck':''}">${s?'✓':i===G.lucky?'+1':i+1}</div>`}).join('')}
@@ -1908,7 +1937,7 @@ const SC_LEAF='<svg class="sorn {p}" viewBox="0 0 26 26"><path d="M3 23C3 12 9 4
 const SC_STAR='<svg class="sorn {p}" viewBox="0 0 26 26"><path d="M13 2l3 7 7 .8-5.3 4.8 1.6 7.4L13 18.3 6.7 22l1.6-7.4L3 9.8l7-.8z" fill="#FFE27A" stroke="#C8962E" stroke-width="1.5"/></svg>';
 function scratchCardHtml(f,L){const corners=['tl','tr','bl','br'],orn=f.r==='r'?corners.map(p=>SC_LEAF.replace('{p}',p)).join(''):f.r==='l'||f.r==='h'?corners.map(p=>SC_STAR.replace('{p}',p)).join(''):'';
  const halo=f.r==='h'?Array.from({length:10},(_,i)=>{const a=i/10*Math.PI*2;return `<i style="left:${50+Math.cos(a)*52}%;top:${50+Math.sin(a)*50}%;animation-delay:${i*.18}s"></i>`}).join(''):'';
- return `<div class="scard t-${f.r}" id="scard">${halo?`<div class="shalo">${halo}</div>`:''}<div class="srib">${RAR[f.r].name}${L>1?`・Lv${L}`:''}</div>
+ return `<div class="scard t-${f.r}" id="scard">${halo?`<div class="shalo">${halo}</div>`:''}<div class="srib">${RAR[f.r].name}${L>1?`<span class="slv">・Lv${L}</span>`:''}</div>
   <div class="scin"><div class="scimg">${plush(f,'fig',L)}</div><div class="scname">${f.name}</div><canvas class="scv" id="scv"></canvas>${orn}</div><canvas class="spcv" id="spcv"></canvas></div>`}
 function scratchRun(stage,r,onReveal){const k=SC[r],cv=stage.querySelector('#scv'),pc=stage.querySelector('#spcv');
  let ctx,pctx,W,H,dpr,base,mask,mctx,grid,gx=24,gy=30,cleared=0,raf=0,parts=[],t0=performance.now(),done=false,drawing=false,last=null,started=false,timer=null,lastMove=0;
@@ -1945,11 +1974,12 @@ function scratchRun(stage,r,onReveal){const k=SC[r],cv=stage.querySelector('#scv
  const P=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)*dpr,(e.clientY-b.top)*dpr]};
  const pres=e=>e.pointerType==='pen'&&e.pressure>0?(.7+e.pressure*.6):1;
  const bar=stage.querySelector('.sbar i'),blow=stage.querySelector('.sblow');
- function reveal(){if(done)return;done=true;drawing=false;rubStop();clearTimeout(timer);blow.hidden=true;stage.classList.add('revealed');stage.querySelector('#scard').classList.add('done');fxImg(stage,'confetti_burst','fx-confetti');if(r==='h'||r==='l')setTimeout(()=>fxImg(stage,'confetti_burst','fx-confetti'),350);
+ function reveal(){if(done)return;done=true;drawing=false;rubStop();clearTimeout(timer);blow.hidden=true;stage.classList.add('revealed');stage.querySelector('#scard').classList.add('ready','done');fxImg(stage,'confetti_burst','fx-confetti');if(r==='h'||r==='l')setTimeout(()=>fxImg(stage,'confetti_burst','fx-confetti'),350);
   if(ctx){for(let i=0;i<(r==='h'?90:r==='l'?60:40);i++)crumbs(Math.random()*W,Math.random()*H,1);parts.forEach(p=>{p.vx*=2.2;p.vy=(Math.random()*-4-1)*dpr});cancelAnimationFrame(raf);loop()}
   onReveal()}
  blow.onclick=reveal;
  if(!setup()){blow.hidden=false;return}
+ render(performance.now());stage.querySelector('#scard').classList.add('ready');
  cv.addEventListener('pointerdown',e=>{if(done)return;e.preventDefault();drawing=true;last=P(e);seg(last,[last[0]+.1,last[1]],pres(e));try{cv.setPointerCapture(e.pointerId)}catch(_){}rubStart();stage.classList.add('touched');
   if(!started){started=true;clearTimeout(timer);timer=setTimeout(()=>{if(!done)blow.hidden=false},4500)}});
  cv.addEventListener('pointermove',e=>{if(!drawing||done)return;const evs=e.getCoalescedEvents?e.getCoalescedEvents():[];let dist=0;
