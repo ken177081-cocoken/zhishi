@@ -534,6 +534,29 @@ body.battle header{display:none}
  background:linear-gradient(#FFF8EC,#F6E6C9);color:#4A3426;font-size:21px;font-weight:700;box-shadow:0 5px 0 #B9946C,0 10px 18px rgba(30,20,10,.3)}
 .sv-next:active{transform:translateY(3px);box-shadow:0 2px 0 #B9946C}
 .map-total{font-family:var(--num);font-weight:800;font-size:15px;background:var(--card);border:2px solid var(--edge);border-radius:999px;padding:2px 12px}
+
+/* ===== 左右滑動 ===== */
+.worlds{overflow:hidden;touch-action:pan-y;margin:0 -16px;padding:0 16px}
+.wtrack{display:flex;align-items:flex-start;gap:32px;transition:transform .42s cubic-bezier(.25,1,.4,1);will-change:transform}
+.wtrack.drag{transition:none}
+.wpage{flex:0 0 100%;min-width:0;transition:opacity .3s}
+.wpage.off{opacity:.55}
+.wdots{display:flex;justify-content:center;align-items:center;gap:8px;margin:-6px 0 12px;font-size:13px;color:var(--muted)}
+.wdots i{width:10px;height:10px;border-radius:50%;background:var(--lock);border:2px solid var(--edge);transition:all .25s}
+.wdots i.on{width:26px;border-radius:999px;background:var(--pencil)}
+.swipe-hint{animation:hintNudge 2.4s ease-in-out 1s 2}
+@keyframes hintNudge{20%{transform:translateX(-18px)}40%{transform:translateX(0)}}
+#isleBody{touch-action:pan-y;transition:transform .3s cubic-bezier(.25,1,.4,1),opacity .3s}
+#isleBody.drag{transition:none}
+#island .bar{justify-content:space-between}
+.isle-nav{display:flex;align-items:center;gap:8px}
+.isle-nav button{width:44px;height:44px;border-radius:50%;border:2.5px solid var(--edge);background:linear-gradient(var(--card),var(--cream2));color:var(--ink);font-size:26px;font-weight:700;line-height:1;padding:0 0 4px;box-shadow:0 3px 0 var(--btn-deep)}
+.isle-nav button:disabled{opacity:.35;box-shadow:none}
+.isle-dots{display:flex;gap:6px}
+.isle-dots i{width:9px;height:9px;border-radius:50%;background:var(--lock);border:2px solid var(--edge)}
+.isle-dots i.on{background:var(--pencil);transform:scale(1.25)}
+.isle-dots i.lk{opacity:.45}
+.toast{position:fixed;left:50%;bottom:calc(30px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:90;background:var(--banner);color:var(--banner-ink);border:2px solid #E9C9A0;border-radius:999px;padding:8px 18px;font-weight:700;animation:pop .3s cubic-bezier(.3,1.5,.5,1);pointer-events:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -568,7 +591,7 @@ body.battle header{display:none}
     </div>
     <button class="bank" id="bankCard" type="button"></button>
     <div class="subj"><button type="button" id="subjMath">數學・直式加減</button><button type="button" id="subjCn">國語・寫寫看</button></div>
-    <label class="chal" for="chal"><input type="checkbox" id="chal"><span><b>挑戰模式</b>　沒有提示和進位借位記號，答錯只說「再想想」<br><span class="tag">每關過關多拿 +1 ★</span></span></label>
+    <label class="chal" for="chal"><input type="checkbox" id="chal"><span><b>挑戰模式</b>　<span id="chalDesc">沒有提示和進位借位記號，答錯只說「再想想」</span><br><span class="tag">每關過關多拿 +1 ★</span></span></label>
     <div class="levels" id="levels"></div>
     <div class="parent">
       <label for="unlockAll"><input type="checkbox" id="unlockAll">家長：開放全部關卡</label>
@@ -601,9 +624,10 @@ body.battle header{display:none}
   </section>
 
   <section id="island" hidden>
-    <div class="bar"><button class="ghost" id="isleBack" type="button">← 冒險地圖</button></div>
-    <div class="isle-head" id="isleHead"></div>
-    <div class="isle-list" id="isleList"></div>
+    <div class="bar"><button class="ghost" id="isleBack" type="button">← 冒險地圖</button>
+      <div class="isle-nav"><button type="button" id="islePrev" aria-label="上一座島">‹</button><div class="isle-dots" id="isleDots"></div><button type="button" id="isleNext" aria-label="下一座島">›</button></div></div>
+    <div id="isleBody"><div class="isle-head" id="isleHead"></div>
+    <div class="isle-list" id="isleList"></div></div>
   </section>
 
   <section id="done" hidden>
@@ -1029,7 +1053,7 @@ function stopBgm(){if(bgmNow&&ac)fadeOut(bgmNow);bgmNow=null;bgmId=null}
 function duck(sec){if(!bgmBus)return;const t=ac.currentTime,g=bgmBus.gain;g.cancelScheduledValues(t);g.setValueAtTime(g.value,t);g.linearRampToValueAtTime(BGMV*.25,t+.15);g.setValueAtTime(BGMV*.25,t+sec);g.linearRampToValueAtTime(BGMV,t+sec+1.2)}
 try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
 let audioOk=false;
-function unlockAudio(){if(!S.sound)return;actx();
+function unlockAudio(){if(!S.sound||!(window.AudioContext||window.webkitAudioContext))return;actx();
  if(!audioOk){try{const b=ac.createBuffer(1,1,22050),s=ac.createBufferSource();s.buffer=b;s.connect(ac.destination);s.start(0)}catch(e){}
   const p=ac.resume&&ac.resume();if(p&&p.then)p.then(()=>{audioOk=ac.state==='running';if(audioOk&&bgmWant&&musicOn()){bgmId=null;startBgm(bgmWant)}});}
  if(bgmWant&&musicOn()&&(bgmId!==bgmWant||!bgmNow))startBgm(bgmWant)}
@@ -1081,7 +1105,7 @@ function renderHome(){
  const cn=S.subj==='cn';$('subjMath').classList.toggle('on',!cn);$('subjCn').classList.toggle('on',cn);
  $('heroH').textContent=cn?'看注音、寫國字、造句子！':'一關一關，練成直式高手！';
  $('heroP').textContent=cn?'句子填空、看注音寫語詞、生字造詞、造句，一課一關。答對一樣拿星星、抽公仔盲盒！':'數字對齊、從個位算起、滿 10 進 1、不夠減就借 1。答對拿星星，星星可以抽「甜甜雲朵鎮」公仔盲盒，還有機會抽到隱藏版！';
- $('levels').innerHTML=renderMap();bindMap();CUR=null;show('home');return;
+ $('levels').innerHTML=renderWorlds();bindMap();bindWorlds();$('chalDesc').textContent=CHAL_DESC[W()];CUR=null;show('home');return;
  if(cn){$('levels').innerHTML=renderCnLevels();document.querySelectorAll('[data-cn]').forEach(el=>el.onclick=()=>startCn(+el.dataset.cn));show('home');return}
  $('levels').innerHTML=LEVELS.map((L,i)=>{const bs=S.best[L.id]||0,r=rating(bs),open=unlocked(i);
   return `<button class="lv" type="button" data-i="${i}" ${open?'':'disabled'}>
@@ -1455,7 +1479,7 @@ $('cnNextBtn').onclick=()=>{if(G.q+1<CN_N){G.q++;cnNext()}else showDone()};
 $('cnInput').addEventListener('input',()=>{if(CQ&&!CQ.done)cnSlots()});
 $('cnInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(CQ&&CQ.done)$('cnNextBtn').click();else cnSubmit()}});
 $('cnBack').onclick=()=>backToIsland();
-$('subjMath').onclick=()=>{S.subj='math';save();renderHome()};$('subjCn').onclick=()=>{S.subj='cn';save();renderHome()};
+$('subjMath').onclick=()=>setWorld('math');$('subjCn').onclick=()=>setWorld('cn');
 function renderCnLevels(){const L=CN_LV();
  return `<div class="hwtip"><b>怎麼用手寫作答？</b><br>iPad 用 Apple Pencil 可以直接寫在答案框裡（隨手寫）。用手指寫的話，先到「設定 → 一般 → 鍵盤 → 鍵盤 → 新增鍵盤 → 繁體中文 → 手寫」，作答時點鍵盤左下角的地球切換。電腦可以用注音輸入。</div>`+
  L.map((x,i)=>{const bs=S.best[x.id]||0,b=x.bank;return `<button class="lv" type="button" data-cn="${i}">
@@ -1594,16 +1618,47 @@ const isleCleared=is=>cleared(is.boss.id);
 function isleOpen(w,i){const is=WORLDS[w].isles[i];return S.unlockAll||i===0||isleCleared(WORLDS[w].isles[i-1])||stagesOf(is).some(cleared)}
 function stageOpen(w,i,j){if(!isleOpen(w,i))return false;const ids=stagesOf(WORLDS[w].isles[i]);return S.unlockAll||j===0||cleared(ids[j-1])||cleared(ids[j])}
 const isleStars=is=>stagesOf(is).reduce((t,id)=>t+(S.best[id]||0),0);
-function renderMap(){const w=W(),Wd=WORLDS[w];let here=Wd.isles.findIndex((is,i)=>isleOpen(w,i)&&!isleCleared(is));
+function renderMap(w){const Wd=WORLDS[w];let here=Wd.isles.findIndex((is,i)=>isleOpen(w,i)&&!isleCleared(is));
  const all=Wd.isles.flatMap(stagesOf),done=all.filter(cleared).length;
- return `<div class="map-head"><h2 class="map-title">${Wd.title}・冒險地圖</h2><span class="map-total">${done} / ${all.length}</span><button class="ghost" type="button" id="storyBtn">看故事</button></div>
+ return `<div class="map-head"><h2 class="map-title">${Wd.title}・冒險地圖</h2><span class="map-total">${done} / ${all.length}</span><button class="ghost story-btn" type="button">看故事</button></div>
  <div class="map">${Wd.isles.map((is,i)=>{const open=isleOpen(w,i),n=stagesOf(is).length;
-  return `<button class="map-isle ${open?'':'locked'} ${i%2?'r':'l'}" type="button" data-isle="${i}" ${open?'':'disabled'}>
+  return `<button class="map-isle ${open?'':'locked'} ${i%2?'r':'l'}" type="button" data-isle="${i}" data-w="${w}" ${open?'':'disabled'}>
    ${i===here?'<span class="here">你在這裡</span>':''}${isleSvg(is.theme)}${open?'':'<span class="lock-badge"></span>'}
    <span class="isle-name">${is.name}</span><span class="isle-sub">${is.sub}</span>
    <span class="isle-prog">${isleCleared(is)?'✓ 已完成':`★ ${isleStars(is)} / ${n*3}`}</span></button>`}).join('')}</div>`}
-function bindMap(){document.querySelectorAll('[data-isle]').forEach(el=>el.onclick=()=>showIsland(W(),+el.dataset.isle));$('storyBtn').onclick=()=>playStory()}
-function showIsland(w,i){CUR={w,i};S.subj=w;const is=WORLDS[w].isles[i],ids=stagesOf(is);
+function bindMap(){document.querySelectorAll('[data-isle]').forEach(el=>el.onclick=()=>showIsland(el.dataset.w,+el.dataset.isle));document.querySelectorAll('.story-btn').forEach(b=>b.onclick=()=>playStory())}
+const WORDER=['math','cn'];
+function renderWorlds(){const idx=WORDER.indexOf(W());
+ return `<div class="wdots" aria-hidden="true">${WORDER.map((w,i)=>`<i class="${i===idx?'on':''}"></i>`).join('')}<span>左右滑動換世界</span></div>
+ <div class="worlds" id="worlds"><div class="wtrack ${S.swiped?'':'swipe-hint'}" id="wtrack" style="transform:translateX(calc(${-idx*100}% - ${idx*32}px))">${WORDER.map((w,i)=>`<div class="wpage ${i===idx?'':'off'}" data-wp="${w}">${renderMap(w)}</div>`).join('')}</div></div>`}
+function setWorld(w){if(W()===w){snapWorld();return}S.subj=w;S.swiped=true;save();const cn=w==='cn';
+ $('subjMath').classList.toggle('on',!cn);$('subjCn').classList.toggle('on',cn);snapWorld()}
+const CHAL_DESC={math:'沒有提示和進位借位記號，答錯只說「再想想」',cn:'沒有「提示」按鈕，答錯不給注音和第一個字，只說「再想想」'};
+function snapWorld(){$('chalDesc').textContent=CHAL_DESC[W()];const t=$('wtrack');if(!t)return;const idx=WORDER.indexOf(W());t.classList.remove('drag','swipe-hint');t.style.transform=`translateX(calc(${-idx*100}% - ${idx*32}px))`;
+ t.querySelectorAll('.wpage').forEach((p,i)=>p.classList.toggle('off',i!==idx));document.querySelectorAll('.wdots i').forEach((d,i)=>d.classList.toggle('on',i===idx))}
+/* 通用左右滑動：只認明顯的橫向手勢，避開螢幕左右邊緣（Safari 返回手勢） */
+function swipeable(el,{move,end}){let x0=0,y0=0,dx=0,mode=0,id=null,w=1,moved=false;
+ el.addEventListener('pointerdown',e=>{if(e.button>0||mode)return;if(e.clientX<24||e.clientX>innerWidth-24)return;x0=e.clientX;y0=e.clientY;dx=0;mode=1;id=e.pointerId;w=el.clientWidth||1;moved=false});
+ el.addEventListener('pointermove',e=>{if(!mode||e.pointerId!==id)return;const ddx=e.clientX-x0,ddy=e.clientY-y0;
+  if(mode===1){if(Math.abs(ddx)<10&&Math.abs(ddy)<10)return;if(Math.abs(ddx)>Math.abs(ddy)*1.3){mode=2;moved=true;try{el.setPointerCapture(id)}catch(_){}}else{mode=0;return}}
+  dx=ddx;move&&move(dx,w)});
+ const up=e=>{if(!mode||e.pointerId!==id)return;const was=mode;mode=0;if(was!==2)return;const dir=dx<-w*.18?1:dx>w*.18?-1:0;end&&end(dir,dx)};
+ el.addEventListener('pointerup',up);el.addEventListener('pointercancel',e=>{if(mode===2){mode=0;end&&end(0,0)}else mode=0});
+ el.addEventListener('click',e=>{if(moved){e.preventDefault();e.stopPropagation();moved=false}},true)}
+function bindWorlds(){const box=$('worlds'),t=$('wtrack');if(!box)return;
+ swipeable(box,{move:(dx,w)=>{const idx=WORDER.indexOf(W());let d=dx;if((idx===0&&dx>0)||(idx===WORDER.length-1&&dx<0))d=dx*.3;
+   t.classList.add('drag');t.classList.remove('swipe-hint');t.style.transform=`translateX(calc(${-idx*100}% - ${idx*32}px + ${d}px))`},
+  end:dir=>{const idx=WORDER.indexOf(W()),n=idx+dir;if(dir&&n>=0&&n<WORDER.length){setWorld(WORDER[n]);playA('ui_tab')}else snapWorld()}})}
+function toast(msg){const t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),1600)}
+let isleAnim=false;
+function goIsle(dir){if(!CUR||isleAnim)return;const{w,i}=CUR,n=i+dir,L=WORLDS[w].isles;const body=$('isleBody');
+ if(n<0||n>=L.length||!isleOpen(w,n)){if(n>=0&&n<L.length)toast('先打敗這座島的守島怪，才能去下一座島！');body.classList.remove('drag');body.style.transform='';sfx('bad');return}
+ isleAnim=true;body.classList.remove('drag');body.style.transform=`translateX(${-dir*60}%)`;body.style.opacity='0';playA('ui_island_select');
+ setTimeout(()=>{showIsland(w,n);body.classList.add('drag');body.style.transform=`translateX(${dir*60}%)`;void body.offsetWidth;body.classList.remove('drag');body.style.transform='';body.style.opacity='';isleAnim=false},reduced()?0:230)}
+swipeable($('isleBody'),{move:dx=>{const b=$('isleBody');b.classList.add('drag');b.style.transform=`translateX(${dx*.85}px)`},end:dir=>{if(dir)goIsle(dir);else{const b=$('isleBody');b.classList.remove('drag');b.style.transform=''}}});
+$('islePrev').onclick=()=>goIsle(-1);$('isleNext').onclick=()=>goIsle(1);
+function showIsland(w,i){CUR={w,i};S.subj=w;const is=WORLDS[w].isles[i],ids=stagesOf(is),LL=WORLDS[w].isles;
+ $('isleDots').innerHTML=LL.map((x,k)=>`<i class="${k===i?'on':''} ${isleOpen(w,k)?'':'lk'}"></i>`).join('');$('islePrev').disabled=i===0;$('isleNext').disabled=i===LL.length-1;
  $('isleHead').innerHTML=`${isleSvg(is.theme,'isle isle-big')}<div><h2 class="isle-title">${is.name}</h2><div class="isle-sub2">${is.sub}</div><p>${is.intro}</p></div>`;
  $('isleList').innerHTML=ids.map((id,j)=>{const open=stageOpen(w,i,j),isBoss=j===ids.length-1,st=isBoss?null:is.stages[j],b=S.best[id]||0;
   const L=w==='math'?LEVELS.find(x=>x.id===id):CN_LV().find(x=>x.id===id);
