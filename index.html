@@ -687,6 +687,16 @@ body.battle{--sage:#5F8A58;--good-ink:#4E7A48}
 .pl-tag{white-space:nowrap}
 .ar-foe.boss .ar-say{bottom:auto;top:4%;right:86%;max-width:min(150px,40vw)}
 .ar-foe.boss .ar-say::after{right:-8px;bottom:14px;transform:rotate(-45deg)}
+
+/* ===== 題目進度點 ===== */
+.qhead .dots{display:flex;align-items:center;gap:7px;padding:5px 10px;background:rgba(255,248,236,.9);border:2px solid #C9A27A;border-radius:999px;box-shadow:0 3px 0 rgba(122,82,54,.35),0 6px 12px rgba(40,25,15,.15)}
+.qhead .dots .dot{position:relative;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:2px solid #DCC4A0;background:#FFFBF2;color:#A08670;font-family:var(--num);font-weight:800;font-size:13px;line-height:1;box-shadow:inset 0 -2px 0 rgba(0,0,0,.06);transition:transform .2s}
+.qhead .dots .dot.now{border-color:#E8B23A;background:#FFF0B8;color:#4A3426;transform:scale(1.18);box-shadow:0 0 0 3px rgba(242,193,78,.35)}
+.qhead .dots .dot.ok{border-color:#C9962E;background:linear-gradient(#FFE89A,#F2C14E)}
+.qhead .dots .dot.ok2{border-color:#8FB487;background:#E6F1DF}
+.dot .dstar{width:16px;height:16px;fill:#fff;stroke:#B9862A;stroke-width:1.6;stroke-linejoin:round}
+.dot.ok2 .dstar{fill:#fff;stroke:#6E9F67}
+.dot .lk{position:absolute;top:-9px;right:-11px;padding:0 4px;border-radius:999px;background:linear-gradient(90deg,#F7A8C8,#B9A6F2);color:#fff;font-size:9px;line-height:14px;font-weight:800;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1299,7 +1309,8 @@ function nextProblem(){
  renderDots();activate(0);render();
  if(P.lucky&&(G.ch||!(P.op==='-'&&P.w[0]<(P.B[0]||0)))){say('幸運題出現了！這題答對，多拿 <b>1</b> 顆星！<br>從<b>個位</b>開始吧。','tip');sfx('magic')}
 }
-function renderDots(){$('dots').innerHTML=Array.from({length:PER},(_,i)=>{const s=G.base[i];return `<div class="dot ${s===3?'ok':s?'ok2':i===G.q?'now':''} ${i===G.lucky?'luck':''}">${s?'✓':i===G.lucky?'+1':i+1}</div>`}).join('')}
+function dotsHtml(n){return Array.from({length:n},(_,i)=>{const s=G.base[i],cur=!s&&i===G.q;return `<div class="dot ${s===3?'ok':s?'ok2':cur?'now':''}" aria-label="第 ${i+1} 題">${s?'<svg class="dstar" viewBox="0 0 24 24"><use href="#st"/></svg>':i+1}${i===G.lucky&&!s?'<i class="lk">+1</i>':''}</div>`}).join('')}
+function renderDots(){$('dots').innerHTML=dotsHtml(PER)}
 function say(html,kind=''){const b=$('bubble');b.className='bubble '+kind;b.innerHTML=html;setHero(kind)}
 function activate(p,keep){P.p=p;P.colWrong=0;
  if(P.op==='-'){const bv=P.B[p]||0;if(P.w[p]<bv){borrow(p,bv);return}}
@@ -1566,7 +1577,7 @@ function startCn(i){const all=CN_LV(),L=all[i];
  C={qs:cnMake(L.lessons,L.mult>=2)};G.hard=L.mult>=2;
  $('cnTitle').textContent=`國語・${L.name}${G.ch?'・挑戰模式':''}`;
  show('cnplay');cnNext()}
-function cnDots(){$('cnDots').innerHTML=Array.from({length:CN_N},(_,i)=>{const s=G.base[i];return `<div class="dot ${s===3?'ok':s?'ok2':i===G.q?'now':''} ${i===G.lucky?'luck':''}">${s?'✓':i===G.lucky?'+1':i+1}</div>`}).join('')}
+function cnDots(){$('cnDots').innerHTML=dotsHtml(CN_N)}
 const CN_TYPE={fill:'句子填空・看注音',blank:'句子填空・自己想',zy:'看注音，寫語詞',read:'認讀字・選讀音',word:'生字造詞',sent:'造句'};
 function cnNext(){CQ=Object.assign({mistakes:0,done:false},C.qs[G.q]);CQ.lucky=G.q===G.lucky;const isRead=CQ.t==='read';
  $('cnBoard').classList.remove('solved','shake');$('cnBoard').classList.toggle('lucky',CQ.lucky);$('cnLucky').hidden=!CQ.lucky;
