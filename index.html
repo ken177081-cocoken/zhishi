@@ -697,6 +697,41 @@ body.battle{--sage:#5F8A58;--good-ink:#4E7A48}
 .dot .dstar{width:16px;height:16px;fill:#fff;stroke:#B9862A;stroke-width:1.6;stroke-linejoin:round}
 .dot.ok2 .dstar{fill:#fff;stroke:#6E9F67}
 .dot .lk{position:absolute;top:-9px;right:-11px;padding:0 4px;border-radius:999px;background:linear-gradient(90deg,#F7A8C8,#B9A6F2);color:#fff;font-size:9px;line-height:14px;font-weight:800;border:1.5px solid #fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+
+/* ===== 戰鬥畫面一頁看完 ===== */
+.arena.wide .ar-me,.arena.wide .ar-foe{bottom:calc(var(--arh) - var(--gy) - 4px)}
+.arena.wide .ar-me{height:min(30vh,300px);left:10%}
+.arena.wide .ar-foe{height:min(27vh,270px)}.arena.wide .ar-foe.boss{height:min(36vh,340px)}
+body.battle{padding-bottom:8px}
+body.battle .board{padding:16px 12px 12px}
+body.battle .say,body.battle #play .say,body.battle #cnplay .say{margin-block:8px}
+body.battle .bubble{padding:7px 12px;font-size:17px;line-height:1.45}
+body.battle .qhead{margin:0 0 6px}
+body.battle .cnbtns{margin-top:8px}
+body.battle #cnNextBtn{margin-top:8px}
+body.battle .big{min-height:52px}
+body.battle{--c:calc(clamp(40px,min(14vw,6.4vh),74px) * var(--fk,1))}
+body.battle .key{height:calc(clamp(44px,6.6vh,62px) * var(--fk,1))}
+@media (min-width:600px){
+ body.battle{--c:calc(clamp(44px,min(13vw,6.6vh),78px) * var(--fk,1))}
+ body.battle .key{height:calc(clamp(46px,6.4vh,66px) * var(--fk,1));font-size:clamp(22px,3.4vh,32px)}
+ body.battle .pad{max-width:min(420px,100%)}
+ body.battle .cnboard{padding:14px 16px}
+ body.battle .qtext{font-size:clamp(22px,3.2vh,32px);line-height:1.55}
+ body.battle .slot-box{width:clamp(46px,6.2vh,64px);height:clamp(46px,6.2vh,64px);font-size:clamp(28px,4.2vh,42px)}
+ body.battle .cnin{font-size:clamp(24px,3.4vh,34px);padding:6px 12px}
+}
+/* 橫放（iPad 橫向）：左邊戰鬥舞台、右邊題目 */
+@media (orientation:landscape) and (min-width:900px){
+ body.battle .wrap{max-width:none}
+ body.battle #play:not([hidden]),body.battle #cnplay:not([hidden]){display:grid;grid-template-columns:minmax(0,1fr) minmax(400px,.95fr);column-gap:22px;align-items:start;align-content:start;min-height:100dvh}
+ body.battle #play>.arena,body.battle #cnplay>.arena{grid-column:1;grid-row:1 / span 12;margin:0 0 0 -16px!important;position:sticky;top:0}
+ body.battle #play>:not(.arena):not(.bbg),body.battle #cnplay>:not(.arena):not(.bbg){grid-column:2;width:100%;max-width:560px;justify-self:center}
+ body.battle #play>.qhead,body.battle #cnplay>.qhead{margin-top:14px}
+ body.battle .bbg{left:-16px;margin-left:0;-webkit-mask-image:none;mask-image:none;border-radius:0 28px 28px 0;box-shadow:6px 0 24px rgba(40,25,15,.18)}
+ body.battle{--c:calc(clamp(40px,8.6vh,80px) * var(--fk,1))}
+ body.battle .key{height:calc(clamp(42px,8.4vh,68px) * var(--fk,1))}
+}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -1306,7 +1341,7 @@ function nextProblem(){
  P=makeP(q);P.lucky=G.q===G.lucky;
  $('board').classList.remove('solved');$('board').classList.toggle('lucky',P.lucky);$('luckyTag').hidden=!P.lucky;
  $('pad').hidden=false;$('nextBtn').hidden=true;
- renderDots();activate(0);render();
+ renderDots();activate(0);render();fitSoon();
  if(P.lucky&&(G.ch||!(P.op==='-'&&P.w[0]<(P.B[0]||0)))){say('幸運題出現了！這題答對，多拿 <b>1</b> 顆星！<br>從<b>個位</b>開始吧。','tip');sfx('magic')}
 }
 function dotsHtml(n){return Array.from({length:n},(_,i)=>{const s=G.base[i],cur=!s&&i===G.q;return `<div class="dot ${s===3?'ok':s?'ok2':cur?'now':''}" aria-label="第 ${i+1} 題">${s?'<svg class="dstar" viewBox="0 0 24 24"><use href="#st"/></svg>':i+1}${i===G.lucky&&!s?'<i class="lk">+1</i>':''}</div>`}).join('')}
@@ -1596,7 +1631,7 @@ function cnNext(){CQ=Object.assign({mistakes:0,done:false},C.qs[G.q]);CQ.lucky=G
  const intro={fill:'看注音，想一想括號裡要寫什麼字。',blank:'沒有注音喔！讀讀看句子，想一想括號裡可以填什麼語詞。',zy:'把注音寫成國字。',read:'這是認讀字，只要會念就好。點一點正確的注音。',word:`「${CQ.char}」可以組成哪些語詞呢？`,sent:'想一想什麼時候會用到這個語詞，寫成一句話。'}[CQ.t];
  cnSay((CQ.lucky?'幸運題！答對多拿 <b>1</b> 顆星。<br>':'')+intro,CQ.lucky?'tip':'');if(CQ.lucky)sfx('magic');
  $('cnOk').hidden=isRead;$('cnHint').hidden=G.ch||isRead;$('cnNextBtn').hidden=true;cnDots();
- if(!isRead)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
+ fitSoon();if(!isRead)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
 function cnPick(btn){if(!CQ||CQ.done)return;const o=CQ.opts[+btn.dataset.o];
  if(o===CQ.ans[0]){btn.classList.add('right');cnFinish(false);return}
  btn.classList.add('wrong');btn.disabled=true;CQ.mistakes++;sfx('bad');foeAtk();
@@ -1844,15 +1879,28 @@ const FOE_HI_CN=['嘿嘿，字都被我藏起來了！','這個字你會寫嗎�
 function petFig(){const id=S.owned[S.owned.length-1];return id?FIGS.find(f=>f.id===id):null}
 function retrig(el,c){if(!el)return;el.classList.remove(c);void el.offsetWidth;el.classList.add(c)}
 let BTL=null;
+const wideMQ=matchMedia('(orientation:landscape) and (min-width:900px)');
 function layoutBattle(){if(!BTL)return;const{k,t}=BTL,bg=$('bbg'+k),ar=$('arena'+k);if(!bg||!ar)return;
- const W=document.documentElement.clientWidth||innerWidth,vh=innerHeight||800,imgH=W*2,g=GROUND[t]||.45;
- const y=Math.round(Math.max(250,Math.min(g*imgH,vh*.42,430))),off=Math.round(y-g*imgH);
+ const vw=document.documentElement.clientWidth||innerWidth,vh=innerHeight||800,g=GROUND[t]||.45,wide=wideMQ.matches;
+ if(wide){/* 橫放：舞台佔左欄整個高度，地面在 70% 的位置 */
+  const W=Math.round(ar.getBoundingClientRect().width)||Math.round(vw*.5),imgH=Math.max(W*2,vh/.9),y=Math.round(vh*.72),off=Math.round(Math.min(0,Math.max(vh-imgH,y-g*imgH)));
+  bg.style.width=W+'px';bg.style.backgroundSize=`${Math.round(imgH/2)}px ${Math.round(imgH)}px`;bg.style.backgroundPosition=`center ${off}px`;bg.style.height=vh+'px';ar.style.setProperty('--arh',vh+'px');
+  ar.style.setProperty('--gy',(y+off<0?y:g*imgH+off)+'px');ar.classList.add('wide');return}
+ ar.classList.remove('wide');bg.style.width='';
+ const fk=+getComputedStyle(document.body).getPropertyValue('--fk')||1,W=vw,imgH=W*2,cap=(vw>=600?vh*.36:vh*.42)*Math.max(.8,fk);
+ const y=Math.round(Math.max(240,Math.min(g*imgH,cap,430))),off=Math.round(y-g*imgH);
  bg.style.backgroundSize=`${W}px ${imgH}px`;bg.style.backgroundPosition=`center ${off}px`;bg.style.height=Math.max(0,imgH+off)+'px';ar.style.setProperty('--arh',y+'px')}
-addEventListener('resize',()=>layoutBattle());
+try{wideMQ.addEventListener('change',()=>fitBattle())}catch(e){}
+/* 自動縮放：內容比螢幕高就一點一點縮小題目格、按鍵和舞台，直到一頁放得下 */
+function fitBattle(){if(!BTL||!document.body.classList.contains('battle'))return;const b=document.body;let k=1;b.style.setProperty('--fk','1');layoutBattle();
+ const over=()=>document.documentElement.scrollHeight-innerHeight;
+ while(over()>2&&k>.7){k=Math.round((k-.04)*100)/100;b.style.setProperty('--fk',k);layoutBattle()}}
+let fitT=0;const fitSoon=()=>{clearTimeout(fitT);fitT=setTimeout(fitBattle,60)};
+addEventListener('resize',()=>fitSoon());
 const FXI={};if(IMG.fx)for(const k in IMG.fx){const im=new Image();im.decoding='async';im.src=IMG.fx[k];FXI[k]=im;if(im.decode)im.decode().catch(()=>{})}
 function fxImg(host,name,cls){if(!FXI[name]||!host)return null;const i=FXI[name].cloneNode();i.alt='';i.className=`fx ${cls}`;if(cls==='fx-shot')i.style.setProperty('--dx',Math.round(host.clientWidth*.44)+'px');host.appendChild(i);setTimeout(()=>i.remove(),1600);return i}
 function arenaSetup(k,n,is,isBoss){const ar=$('arena'+k),host=$('ar'+k);
- ar.style.backgroundImage='';const bg=$('bbg'+k);bg.style.backgroundImage=`url(${IMG.scene[is.theme]})`;BTL={k,t:is.theme};layoutBattle();
+ ar.style.backgroundImage='';const bg=$('bbg'+k);bg.style.backgroundImage=`url(${IMG.scene[is.theme]})`;BTL={k,t:is.theme};layoutBattle();fitSoon();
  G.foe={name:isBoss?is.boss.name:`${is.boss.name}的分身`,k};G.hp=n;G.hpMax=n;
  const pf=petFig(),hi=isBoss?is.boss.hi:(k==='M'?FOE_HI:FOE_HI_CN)[rnd(0,(k==='M'?FOE_HI:FOE_HI_CN).length-1)];
  host.innerHTML=`<div class="plates"><div class="plate me"><div class="pl-name"><b>小勇者</b><span class="pl-tag">${pf?`和${pf.name}`:'出發！'}</span></div><div class="pl-stars" id="ar${k}Stars">${[1,2,3].map(()=>starSvg()).join('')}</div></div>
