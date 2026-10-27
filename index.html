@@ -732,6 +732,35 @@ body.battle .key{height:calc(clamp(44px,6.6vh,62px) * var(--fk,1))}
  body.battle{--c:calc(clamp(40px,8.6vh,80px) * var(--fk,1))}
  body.battle .key{height:calc(clamp(42px,8.4vh,68px) * var(--fk,1))}
 }
+
+/* ===== 國語手寫板 ===== */
+.hw{max-width:560px;margin:6px auto 0;user-select:none;-webkit-user-select:none}
+.hw[hidden]{display:none}
+.hw-cands{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;min-height:50px;align-items:center;margin-bottom:6px}
+.hw-cand{min-width:50px;height:50px;padding:0 8px;border-radius:14px;border:2.5px solid var(--edge);background:linear-gradient(#FFFDF6,#F6E8CC);font-family:var(--kai);font-size:30px;color:#4A3426;box-shadow:0 3px 0 #D9BF97}
+.hw-cand.top{border-color:#E8B23A;background:linear-gradient(#FFF6CF,#FBE3A0);box-shadow:0 3px 0 #C9962E,0 0 0 3px rgba(242,193,78,.3)}
+.hw-cand:active{transform:translateY(2px);box-shadow:0 1px 0 #D9BF97}
+.hw-msg{font-size:14px;color:var(--muted)}
+.hw-row{display:flex;gap:10px;justify-content:center;align-items:stretch}
+.hw-pad{position:relative;width:calc(min(270px,34vh,62vw) * var(--fk,1));aspect-ratio:1;border-radius:18px;border:3px solid #D2623F;background:#FFFDF6;box-shadow:0 4px 0 #D9BF97,inset 0 2px 6px rgba(0,0,0,.05);overflow:hidden;touch-action:none}
+.hw-pad::before,.hw-pad::after{content:"";position:absolute;pointer-events:none;border:0 dashed rgba(210,98,63,.35)}
+.hw-pad::before{left:50%;top:6%;bottom:6%;border-left-width:2px}
+.hw-pad::after{top:50%;left:6%;right:6%;border-top-width:2px}
+.hw-pad canvas{position:absolute;inset:0;width:100%;height:100%;touch-action:none;z-index:1}
+.hw-ph{position:absolute;inset:0;display:grid;place-items:center;color:rgba(210,98,63,.35);font-size:15px;font-weight:700;pointer-events:none;text-align:center;padding:10px}
+.hw-side{display:flex;flex-direction:column;gap:8px;justify-content:center}
+.hw-side button{min-width:84px;min-height:46px;border-radius:14px;border:2.5px solid var(--edge);background:linear-gradient(#FFF8EC,#F6E6C9);color:#4A3426;font-weight:700;font-size:15px;box-shadow:0 3px 0 #D9BF97;padding:4px 8px}
+.hw-side button:active{transform:translateY(2px);box-shadow:0 1px 0 #D9BF97}
+.hw-side .hw-next{background:linear-gradient(#FCE8AE,#F2C14E);border-color:#C9962E;box-shadow:0 3px 0 #B98A2E;min-height:54px;font-size:16px}
+.hw-cands{min-height:30px!important}
+.hw-side .hw-kb{min-height:34px;font-size:12px;opacity:.75}
+.hw.off{opacity:.5;pointer-events:none}
+.slot-box.cur{border-color:#E8B23A;background:#FFF6CF;animation:glow 1.2s ease-in-out infinite}
+.hw-line{font-family:var(--kai);font-size:clamp(22px,3.2vh,30px);min-height:1.6em;border-bottom:3px dashed #D2623F;padding:0 6px;max-width:100%;word-break:break-all;color:#4A3426}
+.hw-line .caret{display:inline-block;width:2px;height:1em;background:#D2623F;vertical-align:-2px;animation:islTwinkle 1s steps(2) infinite}
+#cnplay.typing .hw{display:none}
+#cnplay:not(.typing) #hwBackToPen{display:none!important}
+#cnplay:not(.typing) #cnInput{display:none}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -795,8 +824,12 @@ body.battle .key{height:calc(clamp(44px,6.6vh,62px) * var(--fk,1))}
     <div class="board cnboard" id="cnBoard"><div class="lucky-tag" id="cnLucky" hidden>幸運題・答對 +1 ★</div>
       <div class="cnq"><div class="qtype" id="qType"></div><div class="qtext" id="qText"></div><div class="qslots" id="qSlots"></div></div></div>
     <div class="say"><img class="say-hero" alt=""><div class="bubble" id="cnBubble"></div></div>
+    <div class="hw" id="hw"><div class="hw-cands" id="hwCands"><span class="hw-msg">在格子裡寫一個字，寫好按「下一個字」</span></div>
+      <div class="hw-row"><div class="hw-pad" id="hwPad"><canvas id="hwCv"></canvas><div class="hw-ph" id="hwPh">在這裡寫字</div></div>
+      <div class="hw-side"><button type="button" id="hwNext" class="hw-next">下一個字 ➜</button><button type="button" id="hwUndo">↶ 上一筆</button><button type="button" id="hwClear">重寫這個字</button><button type="button" id="hwBack">⌫ 刪一個字</button><button type="button" class="hw-kb" id="hwKb">改用打字</button></div></div></div>
     <textarea id="cnInput" class="cnin" rows="1" lang="zh-Hant" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="答案"></textarea>
     <div class="cnbtns"><button class="big" id="cnOk" type="button">寫好了</button><button class="big alt" id="cnHint" type="button">提示</button></div>
+    <button class="linkbtn" id="hwBackToPen" type="button" style="display:block;margin:6px auto 0">改回手寫</button>
     <button class="big" id="cnNextBtn" type="button" hidden>下一題 →</button>
   </section>
 
@@ -1631,15 +1664,16 @@ function cnNext(){CQ=Object.assign({mistakes:0,done:false},C.qs[G.q]);CQ.lucky=G
  const intro={fill:'看注音，想一想括號裡要寫什麼字。',blank:'沒有注音喔！讀讀看句子，想一想括號裡可以填什麼語詞。',zy:'把注音寫成國字。',read:'這是認讀字，只要會念就好。點一點正確的注音。',word:`「${CQ.char}」可以組成哪些語詞呢？`,sent:'想一想什麼時候會用到這個語詞，寫成一句話。'}[CQ.t];
  cnSay((CQ.lucky?'幸運題！答對多拿 <b>1</b> 顆星。<br>':'')+intro,CQ.lucky?'tip':'');if(CQ.lucky)sfx('magic');
  $('cnOk').hidden=isRead;$('cnHint').hidden=G.ch||isRead;$('cnNextBtn').hidden=true;cnDots();
- fitSoon();if(!isRead)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
+ $('hw').hidden=isRead;$('hw').classList.remove('off');$('cnplay').classList.toggle('typing',!!S.cnTyping&&!isRead);hwReset();fitSoon();if(!isRead&&S.cnTyping)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
 function cnPick(btn){if(!CQ||CQ.done)return;const o=CQ.opts[+btn.dataset.o];
  if(o===CQ.ans[0]){btn.classList.add('right');cnFinish(false);return}
  btn.classList.add('wrong');btn.disabled=true;CQ.mistakes++;sfx('bad');foeAtk();
  if(CQ.mistakes>=2){$('qSlots').querySelectorAll('.opt').forEach(b=>{if(CQ.opts[+b.dataset.o]===CQ.ans[0])b.classList.add('right')});cnFinish(true);return}
  cnSay(G.ch?'再想想！':'再想想！念念看整個語詞。','bad')}
-function cnSlots(){const v=cnNorm($('cnInput').value);let n=CQ.t==='fill'||CQ.t==='zy'||CQ.t==='blank'?CQ.ans[0].length:CQ.t==='word'?Math.max(2,v.length):0;
+function cnSlots(){const v=[...cnNorm($('cnInput').value)];if(CQ.t==='sent'){$('qSlots').innerHTML=`<div class="hw-line">${v.join('')}<span class="caret"></span></div><div class="tag">已寫 ${v.length} 個字</div>`;return}
+ let n=CQ.t==='fill'||CQ.t==='zy'||CQ.t==='blank'?[...CQ.ans[0]].length:CQ.t==='word'?Math.max(2,v.length+(v.length<4&&!CQ.done?1:0)):0;
  if(!n){$('qSlots').innerHTML='';return}
- $('qSlots').innerHTML=Array.from({length:n},(_,i)=>`<span class="slot-box ${v[i]?'on':''}">${v[i]||''}</span>`).join('')}
+ $('qSlots').innerHTML=Array.from({length:n},(_,i)=>`<span class="slot-box ${v[i]?'on':''} ${i===v.length&&!CQ.done?'cur':''}">${v[i]||''}</span>`).join('')}
 function cnSay(h,k=''){const b=$('cnBubble');b.className='bubble '+k;b.innerHTML=h;setHero(k)}
 function cnSubmit(){if(!CQ||CQ.done||CQ.t==='read')return;const r=cnCheck(CQ,$('cnInput').value);
  if(!cnNorm($('cnInput').value)){cnSay(r.msg,'tip');return}
@@ -1653,7 +1687,7 @@ function cnHint(){if(!CQ||CQ.done)return;
  const h={blank:`注音是「<b>${CQ.zy}</b>」。`,fill:`第一個字是「<b>${CQ.ans&&CQ.ans[0][0]}</b>」，一共 ${CQ.ans&&CQ.ans[0].length} 個字。`,zy:`第一個字是「<b>${CQ.ans&&CQ.ans[0][0]}</b>」。`,
   word:`可以在「${CQ.char}」的前面或後面加一個字，例如「${(CQ.eg||[])[0]||''}」。`,sent:`可以想想：誰？在哪裡？做什麼？例如：${(CQ.eg||[])[0]||''}`}[CQ.t];cnSay('小提示：'+h,'tip')}
 function cnFinish(gaveUp){CQ.done=true;const st=gaveUp?1:CQ.mistakes===0?3:CQ.mistakes===1?2:1;
- G.base.push(st);G.mist+=CQ.mistakes;$('cnInput').disabled=true;if(!gaveUp)bossHit();
+ G.base.push(st);G.mist+=CQ.mistakes;$('cnInput').disabled=true;$('hw').classList.add('off');if(!gaveUp)bossHit();
  if(CQ.t==='read')$('qSlots').querySelectorAll('.opt').forEach(b=>b.disabled=true);
  let msg='';const ans=CQ.ans?CQ.ans[0]:'';
  if(gaveUp){msg=CQ.t==='read'?`沒關係！「${CQ.c}」念作「<b class="noz">${ans}</b>」。`:CQ.t==='fill'||CQ.t==='zy'||CQ.t==='blank'?`沒關係！答案是「<b>${ans}</b>」，下次一定記得。`:`沒關係，看看範例：${(CQ.eg||[]).slice(0,3).join('、')}`;sfx('giveup')}
@@ -1666,7 +1700,59 @@ function cnFinish(gaveUp){CQ.done=true;const st=gaveUp?1:CQ.mistakes===0?3:CQ.mi
  if(CQ.t==='read')$('qText').querySelectorAll('.tgt').forEach(e=>{e.classList.remove('noz');e.textContent=e.textContent;zyAnnotate(e)});
  cnSay(msg,gaveUp?'tip':'good');cnDots();
  $('cnOk').hidden=true;$('cnHint').hidden=true;$('cnNextBtn').hidden=false;$('cnNextBtn').textContent=G.q+1<CN_N?'下一題 →':'看成績！';$('cnNextBtn').focus()}
-$('cnOk').onclick=cnSubmit;$('cnHint').onclick=cnHint;
+
+/* ---------- 國語手寫板 ---------- */
+const HW={strokes:[],cur:null,penSeen:false,timer:0,reqId:0,cands:[]};
+const hwCv=$('hwCv'),hwCtx=hwCv.getContext&&hwCv.getContext('2d');
+function hwSize(){const r=hwCv.getBoundingClientRect(),d=Math.min(3,window.devicePixelRatio||1);if(!r.width)return;const w=Math.round(r.width*d),h=Math.round(r.height*d);
+ if(hwCv.width!==w||hwCv.height!==h){hwCv.width=w;hwCv.height=h;hwRedraw()}}
+function hwRedraw(){if(!hwCtx)return;const d=hwCv.width/(hwCv.getBoundingClientRect().width||1);hwCtx.setTransform(1,0,0,1,0,0);hwCtx.clearRect(0,0,hwCv.width,hwCv.height);hwCtx.setTransform(d,0,0,d,0,0);
+ hwCtx.lineCap='round';hwCtx.lineJoin='round';hwCtx.strokeStyle='#3E2A1E';
+ for(const st of HW.strokes.concat(HW.cur?[HW.cur]:[])){for(let i=1;i<st.x.length;i++){hwCtx.lineWidth=st.w[i];hwCtx.beginPath();hwCtx.moveTo(st.x[i-1],st.y[i-1]);hwCtx.lineTo(st.x[i],st.y[i]);hwCtx.stroke()}
+  if(st.x.length===1){hwCtx.beginPath();hwCtx.arc(st.x[0],st.y[0],st.w[0]/2,0,7);hwCtx.fillStyle='#3E2A1E';hwCtx.fill()}}
+ $('hwPh').hidden=HW.strokes.length>0||!!HW.cur}
+function hwPt(e){const r=hwCv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
+const hwW=e=>{const base=Math.max(5,(hwCv.getBoundingClientRect().width||260)/32);return e.pointerType==='pen'&&e.pressure>0?base*(.6+e.pressure*.9):base};
+hwCv.addEventListener('pointerdown',e=>{if(!CQ||CQ.done)return;if(e.pointerType==='pen')HW.penSeen=true;else if(HW.penSeen&&e.pointerType==='touch')return;
+ e.preventDefault();hwSize();try{hwCv.setPointerCapture(e.pointerId)}catch(_){}const[x,y]=hwPt(e);HW.cur={x:[x],y:[y],t:[0],t0:performance.now(),w:[hwW(e)],id:e.pointerId};clearTimeout(HW.timer);hwRedraw()});
+hwCv.addEventListener('pointermove',e=>{const c=HW.cur;if(!c||e.pointerId!==c.id)return;e.preventDefault();
+ for(const ev of (e.getCoalescedEvents?e.getCoalescedEvents():[])||[e]){const[x,y]=hwPt(ev);c.x.push(x);c.y.push(y);c.t.push(Math.round(performance.now()-c.t0));c.w.push(hwW(ev))}
+ if(!(e.getCoalescedEvents&&e.getCoalescedEvents().length)){const[x,y]=hwPt(e);c.x.push(x);c.y.push(y);c.t.push(Math.round(performance.now()-c.t0));c.w.push(hwW(e))}
+ hwRedraw()});
+const hwUp=e=>{const c=HW.cur;if(!c||e.pointerId!==c.id)return;HW.strokes.push(c);HW.cur=null;hwRedraw();clearTimeout(HW.timer);HW.timer=setTimeout(hwRecognize,250)};
+hwCv.addEventListener('pointerup',hwUp);hwCv.addEventListener('pointercancel',hwUp);
+['touchstart','touchmove'].forEach(ev=>hwCv.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+function hwFetch(){const r=hwCv.getBoundingClientRect(),n=HW.strokes.length;
+ const ink=HW.strokes.map(st=>[st.x.map(Math.round),st.y.map(Math.round),st.t]);
+ const body={options:'enable_pre_space',requests:[{writing_guide:{writing_area_width:Math.round(r.width),writing_area_height:Math.round(r.height)},ink,language:'zh_TW',max_num_results:10,max_completions:0}]};
+ const p=fetch('https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
+  .then(r=>r.json()).then(j=>{const list=(j&&j[0]==='SUCCESS'&&j[1]&&j[1][0]&&j[1][0][1])||[];const seen=new Set(),out=[];
+   for(const c of list){const ch=[...String(c)][0];if(ch&&/[㐀-鿿豈-﫿]/.test(ch)&&!seen.has(ch)){seen.add(ch);out.push(ch)}if(out.length>=6)break}return out});
+ HW.pending={n,p};return p}
+function hwRecognize(){if(HW.strokes.length)hwFetch().catch(()=>{})}
+function hwMsg(t){$('hwCands').innerHTML=`<span class="hw-msg">${t}</span>`}
+function hwShowCands(){hwMsg('在格子裡寫一個字，寫好按「下一個字」')}
+/* 依題目挑字：辨識結果前 3 名裡有這一格該寫的字就算寫對（小朋友字比較歪），否則用第 1 名 */
+function hwPick(list){if(!list.length)return null;const v=[...cnNorm($('cnInput').value)],pos=v.length,top=list.slice(0,3);let want=[];
+ if(CQ.ans&&CQ.t!=='read')want=CQ.ans.map(a=>[...a][pos]).filter(Boolean);
+ if(CQ.t==='word'&&!v.includes(CQ.char))want.push(CQ.char);
+ if(CQ.t==='sent')want=[...CQ.w];
+ return top.find(c=>want.includes(c))||list[0]}
+async function hwCommitPending(){if(!HW.strokes.length)return true;if(HW.busy)return false;HW.busy=true;hwMsg('認字中…');
+ try{const list=await(HW.pending&&HW.pending.n===HW.strokes.length?HW.pending.p:hwFetch());const ch=hwPick(list);
+  if(!ch){hwMsg('看不出來是哪個字，按「重寫這個字」再寫清楚一點');return false}hwCommit(ch);return true}
+ catch(e){hwMsg('需要網路才能認字，請檢查網路，或按「改用打字」');return false}finally{HW.busy=false}}
+function hwCommit(ch){if(!CQ||CQ.done||!ch)return;const inp=$('cnInput');inp.value=(inp.value||'')+ch;HW.strokes=[];HW.cur=null;HW.pending=null;hwRedraw();hwShowCands();playA('ui_tap');cnSlots()}
+function hwReset(){HW.strokes=[];HW.cur=null;HW.pending=null;HW.busy=false;clearTimeout(HW.timer);hwRedraw();hwShowCands();requestAnimationFrame(hwSize)}
+$('hwNext').onclick=()=>hwCommitPending();
+$('hwUndo').onclick=()=>{HW.strokes.pop();hwRedraw();clearTimeout(HW.timer);HW.timer=setTimeout(hwRecognize,150)};
+$('hwClear').onclick=()=>{HW.strokes=[];HW.pending=null;hwRedraw();hwShowCands()};
+$('hwBack').onclick=()=>{if(HW.strokes.length){HW.strokes=[];HW.pending=null;hwRedraw();hwShowCands();return}const inp=$('cnInput');inp.value=[...inp.value].slice(0,-1).join('');cnSlots()};
+$('hwKb').onclick=()=>{$('cnplay').classList.add('typing');S.cnTyping=true;save();setTimeout(()=>{try{$('cnInput').focus()}catch(e){}},30)};
+addEventListener('resize',()=>{if(!$('cnplay').hidden)hwSize()});
+
+$('hwBackToPen').onclick=()=>{$('cnplay').classList.remove('typing');S.cnTyping=false;save();try{$('cnInput').blur()}catch(e){}hwReset()};
+$('cnOk').onclick=async()=>{if(HW.strokes.length&&!$('cnplay').classList.contains('typing')){if(!await hwCommitPending())return}cnSubmit()};$('cnHint').onclick=cnHint;
 $('cnNextBtn').onclick=()=>{if(G.q+1<CN_N){G.q++;cnNext()}else showDone()};
 $('cnInput').addEventListener('input',()=>{if(CQ&&!CQ.done)cnSlots()});
 $('cnInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(CQ&&CQ.done)$('cnNextBtn').click();else cnSubmit()}});
