@@ -1,0 +1,1372 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>直式小達人</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Huninn&family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<style>
+/* Layout: 暖色黏土冒險風——奶油色面板、咖啡色粗邊框、柔和立體按鈕、浮島插圖；單欄，題目板在上、按鍵在下 */
+:root{
+  --paper:#EFE1C8; --grid:#E2CFAF; --card:#FFF8EC; --ink:#4A3426; --muted:#8A715C;
+  --pencil:#F2C14E; --pencil-soft:#FBEBC2; --tint:#F5EAD6; --wood:#C99A6B;
+  --red:#D2623F; --good:#6E9F67; --good-soft:#E4EED8; --bad-soft:#F8DED4; --blue:#4F8BA8;
+  --scrim:rgba(74,52,38,.55);
+  --edge:#9A6A45; --edge-deep:#7A5236; --btn-deep:#D9BF97; --cream2:#F6E6C9; --sage:#86A97F; --hi:rgba(255,255,255,.8);
+  --banner:rgba(84,58,40,.9); --banner-ink:#FFF4DF; --glow:#FFF8EA; --bokeh:rgba(255,255,255,.55); --on-gold:#3E2A1E; --lock:#E4CDAA;
+  --rainbow:linear-gradient(90deg,#F7A8C8,#F2C230,#7CC66B,#8FD3F4,#B9A6F2);
+  --num:'Baloo 2','Arial Rounded MT Bold','Trebuchet MS',system-ui,sans-serif;
+  --zh:'Huninn','PingFang TC','Microsoft JhengHei','Noto Sans TC',sans-serif;
+  --kai:'LXGW WenKai TC','BiauKai','DFKai-SB','Kaiti TC',serif;
+  --c:clamp(46px,14vw,74px);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#2B211B; --grid:#4A3A2E; --card:#3A2D24; --ink:#F6E8D3; --muted:#C2A98F;
+  --pencil:#E8B84A; --pencil-soft:#5A4426; --tint:#46372B; --wood:#A97E55;
+  --red:#E58466; --good:#8CC183; --good-soft:#33452D; --bad-soft:#4A2E26; --blue:#86B9D2; --scrim:rgba(10,6,4,.72);
+  --edge:#B98A5E; --edge-deep:#160F0B; --btn-deep:#1E1510; --cream2:#33271F; --sage:#6F9469; --hi:rgba(255,255,255,.07);
+  --banner:rgba(20,14,10,.88); --banner-ink:#FFF0D8; --glow:#4A3628; --bokeh:rgba(255,226,180,.07); --on-gold:#3E2A1E; --lock:#40332A; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#2B211B; --grid:#4A3A2E; --card:#3A2D24; --ink:#F6E8D3; --muted:#C2A98F;
+  --pencil:#E8B84A; --pencil-soft:#5A4426; --tint:#46372B; --wood:#A97E55;
+  --red:#E58466; --good:#8CC183; --good-soft:#33452D; --bad-soft:#4A2E26; --blue:#86B9D2; --scrim:rgba(10,6,4,.72);
+  --edge:#B98A5E; --edge-deep:#160F0B; --btn-deep:#1E1510; --cream2:#33271F; --sage:#6F9469; --hi:rgba(255,255,255,.07);
+  --banner:rgba(20,14,10,.88); --banner-ink:#FFF0D8; --glow:#4A3628; --bokeh:rgba(255,226,180,.07); --on-gold:#3E2A1E; --lock:#40332A; color-scheme:dark}
+
+[hidden]{display:none!important}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{margin:0;background-color:var(--paper);color:var(--ink);font-family:var(--zh);font-size:17px;line-height:1.55;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px;padding-inline:16px;padding-block:0 40px}
+
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.wrap{max-width:640px;margin:0 auto}
+.star{width:1em;height:1em;fill:var(--pencil);stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round;vertical-align:-.12em}
+.star.off{fill:transparent;stroke:var(--muted);opacity:.55}
+.tag{font-size:13px;letter-spacing:.06em;color:var(--muted)}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-block:18px 10px;flex-wrap:wrap}
+.brand{font-weight:700;font-size:22px;display:flex;align-items:center;gap:8px}
+.brand svg{width:34px;height:34px}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.pill{display:flex;align-items:center;gap:6px;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:4px 12px;font-family:var(--num);font-weight:800;font-size:18px;font-variant-numeric:tabular-nums}
+.ghost{background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:4px 12px;font-size:15px}
+.ghost.gold{background:var(--pencil);color:var(--on-gold);font-weight:700}
+
+/* Home */
+.hero{display:flex;gap:18px;align-items:center;padding-block:14px 18px;flex-wrap:wrap}
+.hero h1{font-size:clamp(30px,8vw,44px);line-height:1.15;margin:0;text-wrap:balance}
+.hero p{margin:6px 0 0;color:var(--muted);max-width:30em}
+.hero-txt{flex:1 1 260px;min-width:0}
+.mini{font-family:var(--num);font-weight:800;font-size:30px;line-height:1.05;text-align:right;background:var(--card);border:2px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);padding:10px 16px;transform:rotate(3deg);font-variant-numeric:tabular-nums}
+.mini .c{color:var(--red);font-size:16px;display:block;margin-bottom:-4px;padding-right:22px}
+.mini .ln{border-top:3px solid var(--ink);margin-top:4px;padding-top:2px;color:var(--good)}
+.bank{display:flex;align-items:center;gap:14px;flex-wrap:wrap;width:100%;text-align:left;background:var(--pencil-soft);border:2px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);padding:12px 16px;margin-bottom:18px}
+.bank:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.bank-n{font-family:var(--num);font-weight:800;font-size:30px;line-height:1.1;font-variant-numeric:tabular-nums}
+.bank-r{flex:1 1 200px;min-width:0}
+.go{font-weight:700;color:var(--blue)}
+.title-chip{display:inline-block;background:var(--card);border:2px solid var(--ink);border-radius:999px;padding:0 10px;font-size:14px;font-weight:700;margin:2px 4px 2px 0}
+.meter{height:12px;border-radius:999px;background:var(--card);border:2px solid var(--ink);overflow:hidden;margin-top:4px}
+.meter i{display:block;height:100%;background:var(--pencil);border-right:2px solid var(--ink);transition:width 1.2s cubic-bezier(.3,1.2,.5,1)}
+.meter.big{height:18px}
+.meter.rainbow i{background:var(--rainbow)}
+.jar{width:64px;height:64px;flex:0 0 auto}
+.levels{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.lv{display:flex;flex-direction:column;gap:6px;text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);padding:14px 16px;transition:transform .12s}
+.lv:hover:not(:disabled){transform:translateY(-2px)}
+.lv:active:not(:disabled){transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.lv:disabled{cursor:not-allowed;opacity:.5;box-shadow:0 5px 0 var(--muted);border-color:var(--muted)}
+.lv-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.lv-name{font-size:21px;font-weight:700}
+.lv-desc{color:var(--muted);font-size:15px}
+.lv-ex{font-family:var(--num);font-weight:600;font-size:18px;color:var(--blue)}
+.mult{font-family:var(--num);font-weight:800;font-size:15px;border:2px solid var(--ink);border-radius:999px;padding:0 10px;background:var(--tint)}
+.mult.m15{background:var(--good-soft)}.mult.m2{background:var(--pencil-soft)}.mult.m4{background:var(--rainbow);color:var(--on-gold)}
+.lv-stars{font-size:20px;display:flex;gap:2px}
+.parent{margin-top:26px;padding-top:14px;border-top:2px dashed var(--grid);display:flex;gap:14px;flex-wrap:wrap;align-items:center;color:var(--muted);font-size:15px}
+.parent label{display:flex;gap:6px;align-items:center;cursor:pointer}
+.parent input{width:18px;height:18px;accent-color:var(--blue)}
+.linkbtn{background:none;border:none;color:var(--muted);text-decoration:underline;padding:0}
+
+/* Play */
+.bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding-block:4px 12px}
+.bar h2{font-size:20px;margin:0;flex:1 1 auto}
+.dots{display:flex;gap:6px}
+.dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--muted);display:grid;place-items:center;font-family:var(--num);font-weight:800;font-size:13px;color:var(--muted)}
+.dot.now{border-color:var(--ink);color:var(--ink);background:var(--pencil-soft)}
+.dot.ok{border-color:var(--ink);background:var(--pencil);color:var(--on-gold)}
+.dot.ok2{border-color:var(--ink);background:var(--good-soft);color:var(--ink)}
+.dot.luck:not(.ok):not(.ok2){border-style:dashed;border-color:var(--red);color:var(--red)}
+.board{position:relative;background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink);padding:26px 14px 22px;display:flex;justify-content:center;transition:border-color .3s,box-shadow .3s}
+.board.lucky{border-color:var(--pencil);box-shadow:0 7px 0 var(--pencil)}
+.board.solved{border-color:var(--good);box-shadow:0 7px 0 var(--good)}
+.board.shake{animation:shake .35s}
+.lucky-tag{position:absolute;top:-14px;left:16px;z-index:4;background:var(--rainbow);color:var(--on-gold);border:2px solid var(--ink);border-radius:999px;padding:0 12px;font-weight:700;font-size:15px;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+.grid{display:grid;grid-template-columns:repeat(var(--n),var(--c));grid-template-rows:calc(var(--c)*.6) var(--c) var(--c) calc(var(--c)*1.1);position:relative}
+.cell{display:grid;place-items:center;font-family:var(--num);font-weight:800;font-size:calc(var(--c)*.7);line-height:1;position:relative;z-index:1;font-variant-numeric:tabular-nums}
+.mark{color:var(--red);font-size:calc(var(--c)*.4);align-self:end;padding-bottom:2px}
+.crossed{color:var(--muted)}
+.crossed::after{content:"";position:absolute;left:20%;right:20%;top:50%;height:4px;border-radius:2px;background:var(--red);transform:rotate(-38deg)}
+.op{color:var(--blue)}
+.rule{grid-column:1/-1;grid-row:3;align-self:end;border-bottom:4px solid var(--ink);border-radius:2px;z-index:1}
+.ans{margin:calc(var(--c)*.12) 4px 0;border:3px dashed var(--grid);border-radius:12px;color:var(--good)}
+.ans.active{border:3px solid var(--pencil);background:var(--pencil-soft);animation:glow 1.2s ease-in-out infinite}
+.ans.done{border-color:transparent}
+.hl{grid-row:1/-1;background:var(--tint);border-radius:14px;z-index:0}
+.pop{animation:pop .45s cubic-bezier(.3,1.6,.5,1)}
+.say{display:flex;gap:10px;align-items:flex-start;margin-block:18px}
+.say svg{flex:0 0 52px;width:52px;height:52px}
+.bubble{flex:1;min-width:0;background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:10px 14px;font-size:18px;position:relative}
+.bubble::before{content:"";position:absolute;left:-9px;top:16px;width:14px;height:14px;background:inherit;border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);transform:rotate(45deg)}
+.bubble.good{background:var(--good-soft)}
+.bubble.bad{background:var(--bad-soft)}
+.bubble.tip{background:var(--pencil-soft)}
+.bubble b{font-family:var(--num);font-size:1.1em}
+.pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:380px;margin:0 auto}
+.key{height:62px;border-radius:16px;background:var(--card);border:2px solid var(--ink);box-shadow:0 4px 0 var(--ink);font-family:var(--num);font-weight:800;font-size:30px}
+.key:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.key.zero{grid-column:span 2}
+.subj{display:flex;gap:8px;margin-bottom:14px}
+.subj button{flex:1;padding:10px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:700;font-size:17px}
+.subj button.on{background:var(--ink);color:var(--paper)}
+.hwtip{grid-column:1/-1;background:var(--tint);border:2px dashed var(--ink);border-radius:16px;padding:10px 14px;font-size:15px}
+.cnboard{padding:24px 18px}
+.cnq{width:100%;text-align:center;display:grid;gap:10px}
+.qtype{font-size:14px;letter-spacing:.1em;color:var(--muted)}
+.qtext{font-size:clamp(22px,6vw,30px);line-height:1.7;text-wrap:balance}
+.qtext .blank{color:var(--blue);white-space:nowrap}
+.qtext .zy{font-size:.7em;letter-spacing:.05em}
+.zybig{font-size:clamp(34px,10vw,52px);letter-spacing:.12em;color:var(--blue)}
+.hanbig{display:inline-grid;place-items:center;width:1.8em;height:1.8em;font-size:1.3em;border:3px solid var(--red);border-radius:10px;color:var(--red);margin:0 4px;vertical-align:middle}
+.qslots{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.slot-box{width:clamp(48px,14vw,64px);height:clamp(48px,14vw,64px);display:grid;place-items:center;font-size:clamp(30px,9vw,42px);border:3px solid var(--red);border-radius:6px;background:linear-gradient(var(--grid),var(--grid)) center/100% 1.5px no-repeat,linear-gradient(90deg,var(--grid),var(--grid)) center/1.5px 100% no-repeat,var(--card)}
+.slot-box.on{animation:pop .35s cubic-bezier(.3,1.6,.5,1)}
+.cnin{display:block;width:100%;max-width:520px;margin:0 auto;font-family:var(--zh);font-size:clamp(26px,7vw,34px);line-height:1.4;color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:16px;padding:10px 14px;resize:none;box-shadow:0 4px 0 var(--ink)}
+.cnin:focus{outline:3px solid var(--pencil);outline-offset:2px}
+.cnin::placeholder{color:var(--muted);font-size:.7em}
+.cnbtns{display:grid;grid-template-columns:2fr 1fr;gap:10px;max-width:520px;margin:14px auto 0}
+.cnbtns .big{max-width:none}
+#cnNextBtn{margin-top:14px}
+.zc{display:inline-flex;align-items:center;white-space:nowrap;vertical-align:baseline}
+.zb{display:inline-grid;grid-template-columns:auto auto;align-items:center;justify-items:center;font-size:max(.4em,9px);line-height:1;margin-left:.06em;font-weight:400;letter-spacing:0;text-indent:0;color:inherit;opacity:.9}
+.zb i{font-style:normal}
+.zb .zn{grid-column:1;grid-row:1;line-height:.6}
+.zb .zs{grid-column:1;grid-row:2;display:flex;flex-direction:column;align-items:center}
+.zb .zt{grid-column:2;grid-row:2;margin-left:.04em}
+.nozy .zb{display:none}
+.tgt u{text-decoration:none;color:var(--red);font-weight:700}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;width:100%;max-width:420px;margin:6px auto 0}
+.opt{min-height:64px;border-radius:16px;border:2px solid var(--ink);background:var(--card);box-shadow:0 4px 0 var(--ink);font-size:28px;letter-spacing:.08em}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad,#D8432F);opacity:.7}
+.opt.right{background:var(--good-soft);border-color:var(--good);animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+.key.zero.wide{grid-column:1/-1}
+.chal{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:2px dashed var(--ink);border-radius:16px;padding:12px 16px;margin-bottom:16px;cursor:pointer}
+.chal input{width:22px;height:22px;margin-top:3px;accent-color:var(--red);flex:0 0 auto}
+.chal.on{border-style:solid;border-color:var(--red);background:var(--bad-soft)}
+.key.hint{font-family:var(--zh);font-size:18px;font-weight:700;background:var(--pencil-soft)}
+.big{display:block;width:100%;max-width:380px;margin:0 auto;min-height:60px;border-radius:18px;border:2px solid var(--ink);box-shadow:0 5px 0 var(--ink);background:var(--pencil);color:var(--on-gold);font-size:21px;font-weight:700;padding:8px 14px}
+.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.big.alt{background:var(--card);color:var(--ink)}
+.big.green{background:var(--good);color:#fff}
+.big:disabled{opacity:.5;cursor:not-allowed}
+.fly{position:absolute;left:50%;top:40%;font-size:40px;pointer-events:none;z-index:5;animation:fly 1.1s ease-out backwards}
+
+/* Done */
+.done{text-align:center;padding-block:10px}
+.done h2{font-size:clamp(28px,7vw,40px);margin:4px 0}
+.badge-wrap{position:relative;height:210px;display:grid;place-items:center;overflow:hidden}
+.badge-wrap .rays{opacity:1;animation:spin 14s linear infinite}
+.badge{position:relative;z-index:2;width:150px;height:150px;border-radius:50%;background:var(--pencil);border:4px solid var(--ink);box-shadow:0 7px 0 var(--ink);display:grid;place-items:center;font-family:var(--num);font-weight:800;color:var(--on-gold);animation:pop .6s cubic-bezier(.3,1.6,.5,1)}
+.badge span{font-size:56px;line-height:1;font-variant-numeric:tabular-nums;display:block}
+.badge small{font-family:var(--zh);font-size:13px;font-weight:700;display:block}
+.badge.bump{animation:bump .18s}
+.crown{position:absolute;z-index:3;top:4px;left:50%;width:84px;height:56px;transform:translateX(-50%) rotate(-8deg);animation:drop .7s cubic-bezier(.3,1.5,.5,1) .9s backwards}
+.bigstars{font-size:46px;display:flex;justify-content:center;gap:6px;margin-block:8px}
+.bigstars .star{animation:pop .5s cubic-bezier(.3,1.6,.5,1) backwards}
+.bigstars .star:nth-child(1){animation-delay:.3s}.bigstars .star:nth-child(2){animation-delay:.5s}.bigstars .star:nth-child(3){animation-delay:.7s}
+.note{display:inline-block;background:var(--good-soft);border:2px solid var(--good);border-radius:999px;padding:4px 14px;margin:4px;font-weight:700}
+.bonus{max-width:420px;margin:14px auto 0;text-align:left;background:var(--card);border:2px solid var(--ink);border-radius:18px;padding:8px 16px}
+.brow{display:flex;justify-content:space-between;gap:12px;padding-block:5px;border-bottom:1px dashed var(--grid)}
+.brow b{font-family:var(--num);font-size:19px;color:var(--good);font-variant-numeric:tabular-nums}
+.brow.total{border-bottom:none;font-weight:700}
+.brow.total b{color:var(--ink);font-size:22px}
+.brow.hide{visibility:hidden}
+.brow.show{animation:pop .4s cubic-bezier(.3,1.6,.5,1)}
+.bankbox{max-width:420px;margin:12px auto 0;text-align:left;background:var(--pencil-soft);border:2px solid var(--ink);border-radius:18px;padding:12px 16px}
+.btns{display:grid;gap:14px;margin-top:22px}
+#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:80}
+
+/* Shop */
+.wallet{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:var(--card);border:3px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink);padding:14px 18px;margin-bottom:16px}
+.wallet .bank-n{font-size:40px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tabs button{flex:1;padding:10px;border-radius:14px;border:2px solid var(--ink);background:var(--card);font-weight:700;font-size:17px}
+.tabs button.on{background:var(--ink);color:var(--paper)}
+.blind{text-align:center;background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 6px 0 var(--ink);padding:18px 16px}
+.bbox{width:170px;height:170px;display:block;margin:0 auto;transform-origin:50% 100%;animation:idlewob 2.6s ease-in-out infinite}
+.blind .g-name{font-size:24px}
+.blind .meter{max-width:300px;margin:6px auto 2px}
+.blind .big{margin-top:10px}
+.g-name{font-weight:700;font-size:18px;line-height:1.3}
+.g-cost{font-family:var(--num);font-weight:800;font-size:22px}
+.odds{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.luck{margin-top:14px;text-align:left;background:var(--paper);border:2px dashed var(--ink);border-radius:14px;padding:10px 14px}
+.empty{text-align:center;color:var(--muted);padding:30px 10px;background:var(--card);border:2px dashed var(--grid);border-radius:16px}
+.rar{display:inline-block;font-size:13px;font-weight:700;border-radius:999px;padding:0 10px;border:2px solid var(--ink)}
+.rar-n{background:var(--tint)}.rar-r{background:var(--good-soft)}.rar-l{background:var(--pencil);color:var(--on-gold)}.rar-h{background:var(--rainbow);color:var(--on-gold)}
+
+/* Figures + shelf */
+.fig{width:100px;height:112px;display:block;margin:0 auto}
+.sil{filter:brightness(0);opacity:.16}
+.shelf-head{background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:10px 14px;margin-bottom:14px}
+.shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:0 8px;background-color:var(--card);border:3px solid var(--ink);border-radius:18px;padding:10px 10px 0;box-shadow:0 6px 0 var(--ink)}
+.shelf.l1,.shelf.l2,.shelf.l3{padding-top:24px;background-image:radial-gradient(circle at 12px 9px,var(--pencil) 4px,transparent 5px),radial-gradient(circle at 24px 9px,var(--red) 4px,transparent 5px),radial-gradient(circle at 36px 9px,var(--good) 4px,transparent 5px);background-size:36px 18px;background-repeat:repeat-x}
+.shelf.l2{background-color:var(--tint)}
+.shelf.l3{background-color:var(--pencil-soft);border-color:var(--pencil);box-shadow:0 6px 0 var(--pencil),0 0 26px var(--pencil)}
+.shelf.hid{background-color:var(--paper);border-style:dashed;margin-top:18px}
+.shelf-name{grid-column:1/-1;text-align:center;margin-bottom:6px}
+.slot{display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;border-bottom:10px solid var(--wood);padding:8px 2px 6px;margin-bottom:14px;min-width:0}
+.slot .fig{width:min(92px,100%);height:auto;aspect-ratio:100/112;transition:transform .2s}
+.slot:not(:disabled):hover .fig{transform:translateY(-4px) rotate(-3deg)}
+.slot:disabled{cursor:default}
+.s-name{font-size:14px;font-weight:700;line-height:1.3;text-align:center}
+.empty-slot .s-name{color:var(--muted)}
+.code{width:100%;font-family:ui-monospace,Consolas,monospace;font-size:12px;word-break:break-all;color:var(--ink);background:var(--paper);border:2px solid var(--ink);border-radius:10px;padding:8px;resize:vertical}
+.lvchip{display:inline-block;font-family:var(--num);font-weight:800;font-size:13px;line-height:1.5;border:2px solid var(--ink);border-radius:999px;padding:0 8px;background:var(--tint)}
+.lvchip.l2{background:var(--good-soft)}.lvchip.l3{background:var(--pencil);color:var(--on-gold)}
+.lvrow{display:flex;gap:8px;justify-content:center;margin-top:8px}
+.lvbox{flex:1 1 0;min-width:0;max-width:120px;background:var(--paper);border:2px solid var(--grid);border-radius:12px;padding:6px 4px}
+.lvbox.locked{border-style:dashed}
+.sheet .lvbox .fig{width:100%;max-width:80px;height:auto;aspect-ratio:100/112}
+.slot.new .fig{animation:pop .8s cubic-bezier(.3,1.6,.5,1)}
+
+/* Modal */
+.modal{position:fixed;inset:0;z-index:60;background:var(--scrim);display:grid;place-items:center;padding:16px;overflow-y:auto}
+.sheet{width:100%;max-width:440px;background:var(--card);border:3px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink);padding:20px;text-align:center;animation:pop .35s cubic-bezier(.3,1.4,.5,1)}
+.sheet h3{margin:6px 0 8px;font-size:24px}
+.sheet .btns{margin-top:16px}
+.sheet .fig{width:120px;height:134px}
+.sheet .crown{position:static;transform:rotate(-8deg);display:block;margin:0 auto;width:110px;height:74px;animation:drop .7s cubic-bezier(.3,1.5,.5,1)}
+.fig-big{position:relative;display:inline-block;margin-top:6px}
+.sheet .fig-big .fig{width:170px;height:190px;transform-origin:50% 100%;animation:idle 2.4s ease-in-out infinite}
+.heart{position:absolute;left:50%;top:35%;width:28px;height:28px;fill:var(--red);pointer-events:none;animation:heart 1.1s ease-out backwards}
+
+/* Box opening */
+.gift-stage{position:relative;height:340px;overflow:hidden}
+.rays{position:absolute;left:50%;top:50%;width:440px;height:440px;margin:-220px 0 0 -220px;border-radius:50%;background:repeating-conic-gradient(var(--ray,var(--pencil-soft)) 0 12deg,transparent 12deg 24deg);opacity:0;transition:opacity .6s;z-index:0;pointer-events:none}
+.rays.rainbow{background:repeating-conic-gradient(#F7A8C877 0 10deg,transparent 10deg 20deg,#F2C23077 20deg 30deg,transparent 30deg 40deg,#8FD3F477 40deg 50deg,transparent 50deg 60deg)}
+.gift-stage .rays{top:60%}
+.gift-stage.open .rays{opacity:1;animation:spin 10s linear infinite}
+.gift-stage .box{position:absolute;left:50%;bottom:0;width:170px;height:170px;margin-left:-85px;z-index:2;transform-origin:50% 100%;animation:none}
+.gift-stage.shake .box{animation:wobble .32s 3}
+.gift-stage.flash .box{filter:drop-shadow(0 0 10px #F7A8C8) drop-shadow(0 0 18px #8FD3F4) drop-shadow(0 0 26px #F2C230)}
+.lid{transform-box:fill-box;transform-origin:center;transition:transform .6s cubic-bezier(.3,1.4,.5,1),opacity .6s .2s}
+.gift-stage.open .lid{transform:translate(70px,-110px) rotate(40deg);opacity:0}
+.prize{position:absolute;left:50%;bottom:92px;z-index:3;width:min(250px,84%);background:var(--paper);border:3px dashed var(--ink);border-radius:16px;padding:10px;transform:translate(-50%,70px) scale(.3);opacity:0;transition:transform .8s cubic-bezier(.3,1.5,.5,1) .3s,opacity .3s .3s}
+.prize.h{border:3px solid transparent;background:linear-gradient(var(--paper),var(--paper)) padding-box,var(--rainbow) border-box}
+.gift-stage.open .prize{transform:translate(-50%,0) scale(1);opacity:1}
+.prize .fig{width:110px;height:123px}
+.tap{color:var(--muted);font-size:15px}
+
+@keyframes pop{0%{transform:scale(.3);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes bump{50%{transform:scale(1.1)}}
+@keyframes drop{0%{transform:translate(-50%,-80px) rotate(-30deg);opacity:0}100%{transform:translateX(-50%) rotate(-8deg);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@keyframes wobble{25%{transform:rotate(-9deg)}75%{transform:rotate(9deg)}}
+@keyframes idlewob{0%,40%,100%{transform:rotate(0)}10%{transform:rotate(-5deg)}20%{transform:rotate(5deg)}30%{transform:rotate(-2deg)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes glow{50%{border-color:var(--red)}}
+@keyframes idle{50%{transform:translateY(-6px)}}
+@keyframes squish{30%{transform:scale(1.15,.85)}60%{transform:scale(.92,1.08)}}
+@keyframes heart{0%{opacity:0;transform:translate(-50%,0) scale(.4)}20%{opacity:1}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),-130px) scale(1.1) rotate(var(--rot,0deg))}}
+@keyframes fly{0%{transform:translate(-50%,0) scale(.4);opacity:0}25%{opacity:1;transform:translate(-50%,-20px) scale(1.2)}100%{transform:translate(calc(-50% + var(--dx)),-140px) scale(.8);opacity:0}}
+
+/* ===== 暖色黏土冒險風 ===== */
+body{background-color:var(--paper);background-image:radial-gradient(ellipse 90% 55% at 50% -8%,var(--glow) 0%,transparent 70%),
+ radial-gradient(circle at 8% 22%,var(--bokeh) 0 5px,transparent 6px),radial-gradient(circle at 92% 14%,var(--bokeh) 0 8px,transparent 9px),
+ radial-gradient(circle at 80% 46%,var(--bokeh) 0 4px,transparent 5px),radial-gradient(circle at 16% 70%,var(--bokeh) 0 7px,transparent 8px),
+ radial-gradient(circle at 60% 88%,var(--bokeh) 0 5px,transparent 6px);background-size:auto;background-attachment:fixed}
+.qtext,.hanbig,.slot-box,.cnin,.zybig,.lv-name{font-family:var(--kai)}
+.zb{color:var(--muted)}
+/* 面板：奶油色＋咖啡色粗邊＋立體陰影 */
+.board,.bank,.lv,.wallet,.blind,.sheet,.bonus,.bankbox,.shelf,.shelf-head,.gift,.chal,.hwtip,.bubble,.ticket-row,.empty{
+ border:3px solid var(--edge);border-radius:24px;box-shadow:0 5px 0 var(--edge-deep),0 14px 24px rgba(60,35,20,.18),inset 0 2px 0 var(--hi)}
+.board{background:linear-gradient(var(--card),var(--cream2));border-width:4px}
+.board.lucky{border-color:var(--pencil);box-shadow:0 5px 0 #B98A2E,0 14px 24px rgba(60,35,20,.18)}
+.board.solved{border-color:var(--good);box-shadow:0 5px 0 #4E7A48,0 14px 24px rgba(60,35,20,.18)}
+.bubble{border-radius:18px;background:var(--card)}
+.bubble::before{border-color:var(--edge)}
+.sheet{border-width:4px;border-radius:28px}
+.chal,.hwtip{border-style:solid;background:var(--tint)}
+.chal.on{background:var(--bad-soft);border-color:var(--red)}
+/* 按鈕：奶油色膠囊、底部有厚度 */
+.big,.key,.ghost,.pill,.opt,.gbtn,.tabs button,.subj button,.lv{transition:transform .1s,box-shadow .1s}
+.big,.key,.ghost,.pill,.opt,.gbtn,.tabs button,.subj button{color:var(--ink);border:2.5px solid var(--edge);background:linear-gradient(var(--card),var(--cream2));
+ box-shadow:0 4px 0 var(--btn-deep),0 8px 14px rgba(60,35,20,.15),inset 0 2px 0 var(--hi);font-weight:700}
+.big,.key{border-radius:20px}.ghost,.pill{border-radius:999px}
+.big:active,.key:active,.ghost:active,.opt:active,.gbtn:active,.tabs button:active,.subj button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--btn-deep),0 3px 6px rgba(60,35,20,.15)}
+.big{background:linear-gradient(#FCE8AE,var(--pencil));color:var(--on-gold);box-shadow:0 4px 0 #B98A2E,0 8px 14px rgba(60,35,20,.18),inset 0 2px 0 rgba(255,255,255,.6)}
+.big.alt{background:linear-gradient(var(--card),var(--cream2));color:var(--ink);box-shadow:0 4px 0 var(--btn-deep),0 8px 14px rgba(60,35,20,.15),inset 0 2px 0 var(--hi)}
+.big.green{background:linear-gradient(#A9CFA1,var(--good));color:#fff;box-shadow:0 4px 0 #4E7A48,0 8px 14px rgba(60,35,20,.18)}
+.ghost.gold,.gbtn{background:linear-gradient(#FCE8AE,var(--pencil));color:var(--on-gold)}
+.key.hint{background:linear-gradient(var(--pencil-soft),#F3D891)}
+.tabs button.on,.subj button.on{background:var(--banner);color:var(--banner-ink);border-color:#E9C9A0;box-shadow:0 4px 0 var(--edge-deep),0 8px 14px rgba(60,35,20,.2)}
+/* 標題：咖啡色字＋白色描邊 */
+.brand,.hero h1,.done h2,.sheet h3,.blind .g-name{color:var(--ink);text-shadow:0 2px 0 var(--card),2px 0 0 var(--card),-2px 0 0 var(--card),0 -2px 0 var(--card),2px 2px 0 var(--card),-2px 2px 0 var(--card),0 6px 10px rgba(60,35,20,.22)}
+.brand{font-size:24px;letter-spacing:.04em}
+/* 關卡名稱用深咖啡色橫幅 */
+.bar h2{background:var(--banner);color:var(--banner-ink);border:2px solid #E9C9A0;border-radius:16px;padding:6px 14px;font-size:18px;text-align:center;box-shadow:0 4px 10px rgba(30,20,10,.25)}
+/* 標籤：鼠尾草綠膠囊 */
+.mult,.title-chip{background:var(--sage)!important;color:#fff!important;border:0!important;border-radius:999px;padding:2px 12px;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}
+.mult.m4,.mult.m3{background:linear-gradient(#FCE8AE,var(--pencil))!important;color:var(--on-gold)!important}
+.rar{border-color:var(--edge)}
+.lv{background:linear-gradient(var(--card),var(--cream2));position:relative}
+.lv:hover:not(:disabled){transform:translateY(-2px)}
+.lv:disabled{background:var(--lock);border-color:var(--wood);box-shadow:0 4px 0 var(--btn-deep);opacity:1;filter:saturate(.55)}
+.lv:disabled::after{content:"";position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;border:2px solid var(--edge);
+ background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='5' y='10' width='14' height='11' rx='3' fill='%239A6A45'/%3E%3Cpath d='M8 10V7a4 4 0 0 1 8 0v3' fill='none' stroke='%239A6A45' stroke-width='2.5'/%3E%3C/svg%3E") center/18px no-repeat}
+.lv:disabled .lv-stars{visibility:hidden}
+/* 進度點、題目格 */
+.dot{border:2px solid var(--wood);background:var(--card);box-shadow:inset 0 2px 0 var(--hi)}
+.dot.now{border-color:var(--edge);background:var(--pencil-soft)}
+.dot.ok{border-color:var(--edge);background:var(--pencil);color:var(--on-gold)}
+.hl{background:var(--pencil-soft)}
+.ans.active{border-color:var(--pencil);background:#FCEBB5}
+.ans{border-color:var(--wood)}
+.cell{color:var(--ink)}.op{color:var(--red)}
+.cnin{border:3px solid var(--edge);box-shadow:0 4px 0 var(--btn-deep),inset 0 2px 0 var(--hi);background:var(--card)}
+.opt{font-size:28px}
+.meter{border-color:var(--edge);background:var(--tint)}
+.meter i{background:linear-gradient(#FCE8AE,var(--pencil));border-right-color:var(--edge)}
+.meter.rainbow i{background:var(--rainbow)}
+.badge{border-color:var(--edge);box-shadow:0 6px 0 var(--edge-deep),0 14px 24px rgba(60,35,20,.2)}
+.slot{border-bottom-color:var(--wood)}
+.modal{backdrop-filter:blur(2px)}
+/* 浮島插圖 */
+.island{width:min(230px,58vw);height:auto;flex:0 0 auto}
+.isl-float{animation:islFloat 4.5s ease-in-out infinite}
+.isl-cloud{animation:islCloud 7s ease-in-out infinite}
+.isl-star{animation:islTwinkle 2.4s ease-in-out infinite;transform-origin:212px 40px}
+@keyframes islFloat{50%{transform:translateY(-7px)}}
+@keyframes islCloud{50%{transform:translateX(10px)}}
+@keyframes islTwinkle{50%{transform:scale(.7);opacity:.6}}
+.mini{display:none}
+.hero{justify-content:center}
+.hero-txt{flex-basis:300px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="st" viewBox="0 0 24 24"><path d="M12 2.6l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.3l-5.9 3.2 1.3-6.5L2.5 9.4l6.6-.8z"/></symbol>
+  <symbol id="pencil" viewBox="0 0 48 48"><g transform="rotate(-30 24 24)"><rect x="17" y="3" width="14" height="30" rx="3" fill="var(--pencil)" stroke="var(--ink)" stroke-width="2"/><rect x="17" y="3" width="14" height="7" rx="3" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/><path d="M17 33h14l-7 11z" fill="var(--wood)" stroke="var(--ink)" stroke-width="2" stroke-linejoin="round"/><path d="M22 41h4l-2 3z" fill="var(--ink)"/><circle cx="21.5" cy="19" r="1.7" fill="var(--ink)"/><circle cx="26.5" cy="19" r="1.7" fill="var(--ink)"/><path d="M21 23.5q3 2.6 6 0" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/></g></symbol>
+  <symbol id="jar" viewBox="0 0 64 64"><rect x="18" y="4" width="28" height="8" rx="3" fill="var(--wood)" stroke="var(--ink)" stroke-width="2.5"/><path d="M20 12h24q8 6 8 18v20q0 10-10 10H22q-10 0-10-10V30q0-12 8-18z" fill="var(--tint)" stroke="var(--ink)" stroke-width="2.5"/><g fill="var(--pencil)" stroke="var(--ink)" stroke-width="1.5" stroke-linejoin="round"><path d="M24 36l2.4 4.8 5.3.7-3.9 3.7 1 5.2-4.8-2.6-4.8 2.6 1-5.2-3.9-3.7 5.3-.7z"/><path d="M40 30l2 4 4.4.6-3.2 3 .8 4.4-4-2.2-4 2.2.8-4.4-3.2-3 4.4-.6z"/><path d="M38 46l1.6 3.2 3.5.5-2.5 2.4.6 3.5-3.2-1.7-3.2 1.7.6-3.5-2.5-2.4 3.5-.5z"/></g></symbol>
+  <symbol id="crown" viewBox="0 0 84 56"><path d="M6 48L4 14l20 16L42 4l18 26 20-16-2 34z" fill="var(--pencil)" stroke="var(--ink)" stroke-width="3" stroke-linejoin="round"/><circle cx="42" cy="34" r="5" fill="var(--red)" stroke="var(--ink)" stroke-width="2"/><circle cx="22" cy="38" r="3.5" fill="var(--blue)" stroke="var(--ink)" stroke-width="2"/><circle cx="62" cy="38" r="3.5" fill="var(--blue)" stroke="var(--ink)" stroke-width="2"/></symbol>
+</svg>
+
+<canvas id="confetti"></canvas>
+<div class="wrap">
+  <header>
+    <div class="brand"><svg><use href="#pencil"/></svg>直式小達人</div>
+    <div class="hdr-right">
+      <button class="pill" id="pillBtn" type="button" title="我的星星，按一下去抽盲盒"><svg class="star"><use href="#st"/></svg><span id="balTop">0</span></button>
+      <button class="ghost gold" id="shopTop" type="button">盲盒屋</button>
+      <button class="ghost" id="soundBtn" type="button">聲音：開</button>
+    </div>
+  </header>
+
+  <section id="home">
+    <div class="hero">
+      <div class="hero-txt">
+        <h1 id="heroH">一關一關，練成直式高手！</h1>
+        <p id="heroP">數字對齊、從個位算起、滿 10 進 1、不夠減就借 1。答對拿星星，星星可以抽「甜甜雲朵鎮」公仔盲盒，還有機會抽到隱藏版！</p>
+      </div>
+      <svg class="island" viewBox="0 0 240 210" aria-hidden="true">
+        <defs>
+          <radialGradient id="isGrass" cx="45%" cy="30%" r="75%"><stop offset="0" stop-color="#B8E08A"/><stop offset="1" stop-color="#6FA84F"/></radialGradient>
+          <radialGradient id="isRock" cx="40%" cy="20%" r="85%"><stop offset="0" stop-color="#EDB98C"/><stop offset="1" stop-color="#A9693F"/></radialGradient>
+          <radialGradient id="isLeaf" cx="35%" cy="30%" r="80%"><stop offset="0" stop-color="#A6D97C"/><stop offset="1" stop-color="#4F8A3C"/></radialGradient>
+          <radialGradient id="isCloud" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E9E1D6"/></radialGradient>
+        </defs>
+        <ellipse cx="122" cy="200" rx="70" ry="7" fill="#7A5236" opacity=".18"/>
+        <g class="isl-float">
+          <path d="M40 118 Q36 150 70 166 Q92 190 120 184 Q150 192 170 170 Q204 154 200 118 Z" fill="url(#isRock)"/>
+          <circle cx="78" cy="160" r="16" fill="#B97A4E" opacity=".55"/><circle cx="150" cy="170" r="13" fill="#B97A4E" opacity=".5"/><circle cx="118" cy="178" r="9" fill="#9C6440" opacity=".45"/>
+          <ellipse cx="120" cy="116" rx="84" ry="26" fill="url(#isGrass)"/>
+          <path d="M40 118 q8 8 18 2 q8 8 18 1 q9 8 20 1 q9 8 20 0 q10 8 20 0 q9 8 20 1 q9 7 18 -1 q8 6 16 -2" fill="none" stroke="#5E9443" stroke-width="5" stroke-linecap="round"/>
+          <rect x="146" y="64" width="12" height="44" rx="6" fill="#9A6A45"/>
+          <circle cx="152" cy="58" r="22" fill="url(#isLeaf)"/><circle cx="136" cy="70" r="15" fill="url(#isLeaf)"/><circle cx="168" cy="72" r="14" fill="url(#isLeaf)"/>
+          <circle cx="146" cy="50" r="5" fill="#fff" opacity=".35"/>
+          <g transform="translate(70 84)"><rect x="0" y="12" width="34" height="24" rx="5" fill="#FFF3DC"/><path d="M-4 14 L17 -2 L38 14 Z" fill="#D2623F"/><rect x="12" y="22" width="10" height="14" rx="3" fill="#9A6A45"/></g>
+          <g fill="#fff"><circle cx="102" cy="122" r="3.4"/><circle cx="182" cy="114" r="3"/><circle cx="62" cy="110" r="2.6"/></g>
+          <g fill="#F2C14E"><circle cx="102" cy="122" r="1.4"/><circle cx="182" cy="114" r="1.2"/></g>
+        </g>
+        <g class="isl-cloud"><circle cx="44" cy="44" r="14" fill="url(#isCloud)"/><circle cx="62" cy="38" r="18" fill="url(#isCloud)"/><circle cx="82" cy="46" r="13" fill="url(#isCloud)"/></g>
+        <g class="isl-star" fill="#F2C14E"><path d="M206 30l4 9 9 1-7 6 2 9-8-5-8 5 2-9-7-6 9-1z"/></g>
+      </svg>
+    </div>
+    <button class="bank" id="bankCard" type="button"></button>
+    <div class="subj"><button type="button" id="subjMath">數學・直式加減</button><button type="button" id="subjCn">國語・寫寫看</button></div>
+    <label class="chal" for="chal"><input type="checkbox" id="chal"><span><b>挑戰模式</b>　沒有提示和進位借位記號，答錯只說「再想想」<br><span class="tag">每關過關多拿 +1 ★</span></span></label>
+    <div class="levels" id="levels"></div>
+    <div class="parent">
+      <label for="unlockAll"><input type="checkbox" id="unlockAll">家長：開放全部關卡</label>
+      <button class="linkbtn" id="rulesBtn" type="button">星星怎麼拿？</button>
+      <button class="linkbtn" id="exportBtn" type="button">備份紀錄</button>
+      <button class="linkbtn" id="importBtn" type="button">還原紀錄</button>
+      <button class="linkbtn" id="resetBtn" type="button">清除全部紀錄</button>
+    </div>
+  </section>
+
+  <section id="play" hidden>
+    <div class="bar">
+      <button class="ghost" id="backBtn" type="button">← 關卡</button>
+      <h2 id="lvTitle"></h2>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="board" id="board"><div class="lucky-tag" id="luckyTag" hidden>幸運題・答對 +1 ★</div><div class="grid" id="grid"></div></div>
+    <div class="say"><svg><use href="#pencil"/></svg><div class="bubble" id="bubble"></div></div>
+    <div class="pad" id="pad"></div>
+    <button class="big" id="nextBtn" type="button" hidden>下一題 →</button>
+  </section>
+
+  <section id="cnplay" hidden>
+    <div class="bar">
+      <button class="ghost" id="cnBack" type="button">← 關卡</button>
+      <h2 id="cnTitle"></h2>
+      <div class="dots" id="cnDots"></div>
+    </div>
+    <div class="board cnboard" id="cnBoard"><div class="lucky-tag" id="cnLucky" hidden>幸運題・答對 +1 ★</div>
+      <div class="cnq"><div class="qtype" id="qType"></div><div class="qtext" id="qText"></div><div class="qslots" id="qSlots"></div></div></div>
+    <div class="say"><svg><use href="#pencil"/></svg><div class="bubble" id="cnBubble"></div></div>
+    <textarea id="cnInput" class="cnin" rows="1" lang="zh-Hant" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" aria-label="答案"></textarea>
+    <div class="cnbtns"><button class="big" id="cnOk" type="button">寫好了</button><button class="big alt" id="cnHint" type="button">提示</button></div>
+    <button class="big" id="cnNextBtn" type="button" hidden>下一題 →</button>
+  </section>
+
+  <section id="done" hidden>
+    <div class="done" id="doneBox"></div>
+  </section>
+
+  <section id="shop" hidden>
+    <div class="bar">
+      <button class="ghost" id="shopBack" type="button">← 關卡</button>
+      <h2>盲盒屋</h2>
+    </div>
+    <div class="wallet">
+      <svg class="jar"><use href="#jar"/></svg>
+      <div><div class="tag">我的星星</div><div class="bank-n" id="walletN">0</div></div>
+    </div>
+    <div class="tabs">
+      <button type="button" id="tabShop" class="on">抽盲盒</button>
+      <button type="button" id="tabShelf">我的公仔櫃</button>
+    </div>
+    <div id="shopBody"></div>
+  </section>
+</div>
+
+<div class="modal" id="modal" hidden><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+
+<script>
+(function(){
+const PLACE=['個位','十位','百位','千位'];
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const digits=n=>String(n).split('').reverse().map(Number);
+const starSvg=(on=true)=>`<svg class="star ${on?'':'off'}"><use href="#st"/></svg>`;
+const $=id=>document.getElementById(id);
+const reduced=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
+const dayKey=d=>`${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
+const today=()=>dayKey(new Date()), yesterday=()=>dayKey(new Date(Date.now()-864e5));
+
+/* ---------- figures ---------- */
+const RAR={n:{name:'普通',w:60},r:{name:'稀有',w:30},l:{name:'傳說',w:10},h:{name:'隱藏版'}};
+// btn = action button label, act = animation, pt = particle, snd = sound, say = what the figure says
+const FIGS=[
+ {id:'bear',name:'布丁熊噗林',r:'n',kind:'bear',base:'pudding',c:'#F3C77A',c2:'#FFF3D6',like:'身體軟軟 QQ，像剛做好的布丁',btn:'戳戳肚子',act:'squish',pt:'heart',snd:'boing',say:'噗林噗林～好癢喔！'},
+ {id:'bunny',name:'草莓兔莓莓',r:'n',kind:'bunny',base:'cup',bc:'#F7A8C8',c:'#FFF7F7',c2:'#FFC9D6',like:'住在草莓杯子蛋糕裡',btn:'跳跳跳',act:'hop3',pt:'carrot',snd:'hop',say:'跳跳跳～奶油要掉下來了！'},
+ {id:'cat',name:'奶茶貓咪露',r:'n',kind:'cat',base:'tea',bc:'#9AC7E8',c:'#E8D9C5',c2:'#FFF6EA',like:'喜歡泡在茶杯裡睡午覺',btn:'搔下巴',act:'sleepy',pt:'zzz',snd:'purr',say:'呼嚕呼嚕～茶好香'},
+ {id:'frog',name:'抹茶蛙綠綠',r:'n',kind:'frog',base:'bowl',bc:'#6F9D58',c:'#A8D08D',c2:'#E4F3D6',like:'坐在抹茶碗裡泡澡',btn:'呱一聲',act:'jump',pt:'leaf',snd:'ribbit',say:'呱呱！抹茶泡澡好舒服！'},
+ {id:'pig',name:'甜甜圈豬桃桃',r:'n',kind:'pig',base:'donut',bc:'#F7A8C8',c:'#FFC1CC',c2:'#FFE1E7',like:'套著甜甜圈去游泳',btn:'滾一滾',act:'roll',pt:'mud',snd:'oink',say:'噗嚕！甜甜圈游泳圈！'},
+ {id:'mouse',name:'起司鼠吱吱',r:'n',kind:'mouse',base:'cheese',c:'#D3D3DE',c2:'#F4F4F8',like:'住在起司小屋裡',btn:'給起司',act:'shiver',pt:'cheese',snd:'squeak',say:'吱吱！整間房子都好香！'},
+ {id:'dog',name:'霜淇淋狗蓬蓬',r:'n',kind:'dog',base:'cone',c:'#FBEFD9',c2:'#FFFFFF',c3:'#E3B07A',like:'夏天最受歡迎的狗狗',btn:'丟骨頭',act:'wag',pt:'bone',snd:'bark',say:'汪汪！別讓我融化啦！'},
+ {id:'chick',name:'蛋殼雞啾啾',r:'n',kind:'chick',base:'egg',c:'#FFE066',c2:'#FFF6C2',like:'剛從蛋殼裡探出頭',btn:'餵小米',act:'peck',pt:'seed',snd:'tweet',say:'啾啾！外面好亮喔！'},
+ {id:'sheep',name:'棉花糖羊咩咩',r:'n',kind:'sheep',base:'cloud',bc:'#FFFFFF',c:'#FFE1EC',c2:'#FFF1E6',c3:'#8C7B8F',like:'毛是草莓口味的棉花糖',btn:'摸毛毛',act:'jelly',pt:'wool',snd:'baa',say:'咩～毛毛甜甜的'},
+ {id:'hamster',name:'湯圓鼠圓圓',r:'n',kind:'hamster',base:'bowl',bc:'#F7A8C8',c:'#F2D3B3',c2:'#FFF8EE',like:'冬至最忙的就是牠',btn:'給瓜子',act:'puff',pt:'sunseed',snd:'nom',say:'塞滿滿！湯圓也要！'},
+ {id:'monkey',name:'香蕉猴皮皮',r:'n',kind:'monkey',base:'leaf',c:'#B98A5E',c2:'#F6DFC0',like:'坐在大葉子上曬太陽',btn:'給香蕉',act:'dance',pt:'banana',snd:'ooh',say:'嗚嗚啊啊！香蕉好好吃！'},
+ {id:'elephant',name:'汽水象啵啵',r:'n',kind:'elephant',base:'jelly',c:'#B7D7F2',c2:'#EAF5FF',like:'鼻子會噴出汽水泡泡',btn:'噴泡泡',act:'stretch',pt:'drop',snd:'trumpet',say:'啵啵～汽水噴泉！'},
+ {id:'penguin',name:'雪花冰企鵝冰冰',r:'r',kind:'penguin',base:'bowl',bc:'#9CCFEA',c:'#6C8FD6',c2:'#F4F8FF',like:'住在冰涼的雪花冰上',btn:'溜冰',act:'slide',pt:'snow',snd:'whistle',say:'咻～冰冰涼涼好舒服！'},
+ {id:'panda',name:'飯糰熊貓竹竹',r:'r',kind:'panda',base:'nori',c:'#FAFAFA',c2:'#2B2F45',like:'野餐一定要帶著它',btn:'翻跟斗',act:'tumble',pt:'bamboo',snd:'tumble',say:'看！飯糰翻跟斗！'},
+ {id:'fox',name:'銅鑼燒狐狐',r:'r',kind:'fox',base:'pancake',c:'#F0965A',c2:'#FFF1E3',like:'銅鑼燒是它的小床',btn:'追尾巴',act:'spin',pt:'sparkle',snd:'swoosh',say:'咦？我的尾巴在哪裡？'},
+ {id:'owl',name:'可可貓頭鷹咕咕',r:'r',kind:'owl',base:'mug',bc:'#E25D5D',c:'#A98463',c2:'#F3E3D3',like:'睡前要喝一杯熱可可',btn:'轉頭頭',act:'headturn',pt:'star',snd:'hoot',say:'咕咕～可可暖呼呼'},
+ {id:'koala',name:'珍奶無尾熊抱抱',r:'r',kind:'koala',base:'boba',c:'#CDB9A5',c2:'#F4EAE0',like:'抱著珍奶就能睡一整天',btn:'抱抱它',act:'sway',pt:'gumleaf',snd:'yawn',say:'哈～珍珠 QQ 的……'},
+ {id:'lion',name:'鬆餅獅吼吼',r:'r',kind:'lion',base:'waffle',c:'#F6D58A',c2:'#FFF4D9',c3:'#E0A050',like:'鬃毛聞起來像奶油',btn:'大吼',act:'roar',pt:'burst',snd:'roar',say:'吼～其實我是奶油味的'},
+ {id:'tiger',name:'蜂蜜虎妞',r:'r',kind:'cat',stripes:true,base:'honeypot',c:'#F7B05B',c2:'#FFF4E6',like:'偷吃蜂蜜被抓到好幾次',btn:'撲過來',act:'pounce',pt:'paw',snd:'growl',say:'嗷嗚！蜂蜜是我的！'},
+ {id:'raccoon',name:'泡泡浣熊咪嚕',r:'r',kind:'raccoon',base:'tub',c:'#A3A6B5',c2:'#F4F5FA',like:'每天都要洗泡泡浴',btn:'搓泡泡',act:'scrub',pt:'bubble',snd:'splash',say:'泡泡洗澡最開心！'},
+ {id:'octopus',name:'果凍章魚啵啵',r:'r',kind:'octopus',c:'#F9B6C8',c2:'#FFE3EA',like:'身體是草莓果凍做的',btn:'變魔術',act:'swim',pt:'ink',snd:'bloop',say:'噗！果凍變魔術！'},
+ {id:'dino',name:'恐龍裝寶寶嘎嘎',r:'l',kind:'kid',hood:'dino',c:'#7FCFB8',c2:'#D8F5EC',like:'穿上恐龍裝就變勇敢',btn:'恐龍步',act:'stomp',pt:'rock',snd:'thump',say:'咚！咚！我是大恐龍！'},
+ {id:'whale',name:'薄荷鯨魚藍藍',r:'l',kind:'whale',c:'#8FD3CB',c2:'#E3F7F4',like:'會噴出彩虹汽水',btn:'噴水柱',act:'floaty',pt:'rdrop',snd:'spout',say:'噗～彩虹汽水柱！'},
+ {id:'uni',name:'雲朵獨角獸',r:'l',kind:'uni',base:'cloud',bc:'#DDEBFF',c:'#F7F2FF',c2:'#FFFFFF',like:'住在最高的那朵雲上',btn:'許個願',act:'zoomspin',pt:'rstar',snd:'chime',say:'你的願望會實現喔！'},
+ {id:'deer',name:'星星鹿叮叮',r:'l',kind:'deer',base:'star',c:'#D9A273',c2:'#FFF1E0',like:'坐在星星上，角會開花',btn:'跳支舞',act:'flip',pt:'petal',snd:'bell',say:'叮叮噹～一起跳舞！'},
+ {id:'dragon',name:'火龍裝寶寶噴噴',r:'l',kind:'kid',hood:'dragon',c:'#F08080',c2:'#FFE0B8',like:'穿上火龍裝會噴出小火花',btn:'噴火',act:'lunge',pt:'flame',snd:'fwoosh',say:'呼～是小小的火花！'},
+ {id:'gold',name:'黃金布丁熊',r:'h',kind:'bear',base:'pudding',gold:true,c:'#F2C230',c2:'#FFF0B8',sp:true,like:'只有數學高手才找得到它',btn:'金光閃閃',act:'glow',pt:'coin',snd:'coins',say:'我是幸運黃金布丁！'},
+ {id:'nightwhale',name:'星夜鯨魚',r:'h',kind:'whale',c:'#24346B',c2:'#5B6FB0',dark:true,sp:true,like:'身上裝滿了星星',btn:'星空之歌',act:'swimwave',pt:'tinystar',snd:'song',say:'嗚～嗚～星星好亮'},
+ {id:'rainbunny',name:'彩虹兔裝寶寶',r:'h',kind:'kid',hood:'bunny',c:'#C9B6F5',c2:'#FFE6EE',sp:true,like:'跳一下就會出現彩虹',btn:'彩虹跳',act:'hophigh',pt:'arc',snd:'magic',say:'彩虹出現囉！'},
+ {id:'galaxycat',name:'星空貓裝寶寶',r:'h',kind:'kid',hood:'cat',c:'#3B2D6B',c2:'#7C6BC4',sp:true,starry:true,like:'穿著星空貓裝去旅行',btn:'喵星魔法',act:'floatspin',pt:'planet',snd:'space',say:'喵～歡迎來到喵星！'}
+];
+const REG=FIGS.filter(f=>f.r!=='h'), HID=FIGS.filter(f=>f.r==='h');
+
+function plush(f,cls='',lvl){
+ const O='#2B2F45',s=`stroke="${O}" stroke-width="2.6" stroke-linejoin="round"`,k=f.kind,c=f.c,c2=f.c2,c3=f.c3||c;
+ const limb=k==='panda'?c2:k==='sheep'?c3:c,foot=k==='penguin'||k==='owl'||k==='chick'?'#F2A33A':limb;
+ const tri=(d,fill)=>`<path d="${d}" fill="${fill}" ${s}/>`;
+ let back='',ears='',head=`<circle cx="50" cy="48" r="27" fill="${c}" ${s}/>`,face='',top='';
+ let arms=`<ellipse cx="30" cy="80" rx="7" ry="10" fill="${limb}" ${s}/><ellipse cx="70" cy="80" rx="7" ry="10" fill="${limb}" ${s}/>`;
+ let belly=k==='panda'?'':`<ellipse cx="50" cy="88" rx="14" ry="12" fill="${c2}"/>`;
+ let bodyShape=`<ellipse cx="50" cy="84" rx="24" ry="20" fill="${c}" ${s}/>`;
+ let feet=`<ellipse cx="39" cy="103" rx="9" ry="5.5" fill="${foot}" ${s}/><ellipse cx="61" cy="103" rx="9" ry="5.5" fill="${foot}" ${s}/>`;
+ let extraBody='',ey=47,eyes=true,mouth=true,whiteEyes=k==='panda'||k==='raccoon',blush=true;
+ const nose=(y=55)=>`<ellipse cx="50" cy="${y}" rx="3.4" ry="2.4" fill="${O}"/>`;
+ if(k==='bear'||k==='panda'){const ec=k==='panda'?c2:c;
+  ears=`<circle cx="28" cy="27" r="10" fill="${ec}" ${s}/><circle cx="72" cy="27" r="10" fill="${ec}" ${s}/>`+(k==='bear'?`<circle cx="28" cy="27" r="5" fill="${c2}"/><circle cx="72" cy="27" r="5" fill="${c2}"/>`:'');
+  face=(k==='panda'?`<ellipse cx="39" cy="48" rx="7" ry="9" fill="${c2}" transform="rotate(25 39 48)"/><ellipse cx="61" cy="48" rx="7" ry="9" fill="${c2}" transform="rotate(-25 61 48)"/>`:`<ellipse cx="50" cy="58" rx="10" ry="7.5" fill="${c2}"/>`)+nose()}
+ if(k==='bunny')ears=`<ellipse cx="38" cy="19" rx="7.5" ry="16" fill="${c}" ${s}/><ellipse cx="62" cy="19" rx="7.5" ry="16" fill="${c}" ${s}/><ellipse cx="38" cy="20" rx="3.5" ry="11" fill="${c2}"/><ellipse cx="62" cy="20" rx="3.5" ry="11" fill="${c2}"/>`;
+ if(k==='pig'){ears=tri('M28 34 L28 18 L42 26 Z',c)+tri('M72 34 L72 18 L58 26 Z',c);
+  face=`<ellipse cx="50" cy="57" rx="9.5" ry="7" fill="${c2}" ${s}/><ellipse cx="46.5" cy="57" rx="1.8" ry="2.6" fill="${O}"/><ellipse cx="53.5" cy="57" rx="1.8" ry="2.6" fill="${O}"/>`;mouth=false}
+ if(k==='cat'||k==='fox'||k==='uni'){const h=k==='fox'?6:k==='uni'?16:12,inner=k==='uni'?'#F7A8C8':c2;
+  ears=tri(`M26 38 L29 ${h} L47 26 Z`,c)+tri(`M74 38 L71 ${h} L53 26 Z`,c)+`<path d="M31 32 L32 ${h+9} L41 27 Z" fill="${inner}"/><path d="M69 32 L68 ${h+9} L59 27 Z" fill="${inner}"/>`;
+  if(k==='cat'){const wc=f.dark?'#FFF6C8':O;
+   face=f.stripes?`<ellipse cx="50" cy="58" rx="11" ry="7.5" fill="${c2}"/><path d="M50 22v8M43 24l2 6M57 24l-2 6M23 45h7M22 51h7M77 45h-7M78 51h-7" stroke="${O}" stroke-width="2.6" stroke-linecap="round"/><path d="M48 53h4l-2 2.5z" fill="${O}"/>`
+    :`<path d="M22 54h10M22 59l10-2M78 54H68M78 59l-10-2" stroke="${wc}" stroke-width="1.8" stroke-linecap="round"/><path d="M48 53h4l-2 2.5z" fill="${wc}"/>`;
+   if(f.stripes)extraBody=`<path d="M30 76h6M30 84h5M70 76h-6M70 84h-5" stroke="${O}" stroke-width="2.6" stroke-linecap="round"/>`;
+   if(f.dark)face+=`<g fill="#FFF6C8"><circle cx="34" cy="34" r="1.3"/><circle cx="64" cy="30" r="1.6"/><circle cx="70" cy="62" r="1.2"/><circle cx="40" cy="86" r="1.4"/><circle cx="60" cy="94" r="1.2"/></g>`}
+  if(k==='fox'){face=`<path d="M24 52 Q34 70 50 70 Q66 70 76 52 Q64 60 50 58 Q36 60 24 52Z" fill="${c2}"/><ellipse cx="50" cy="56" rx="3.2" ry="2.3" fill="${O}"/>`;
+   back=`<path d="M68 96 Q100 96 94 64 Q90 70 84 72 Q80 84 68 86Z" fill="${c}" ${s}/><path d="M94 64 Q90 70 84 72 Q88 66 92 60Z" fill="${c2}"/>`}
+  if(k==='uni'){top=`<circle cx="30" cy="34" r="7" fill="#F7A8C8" ${s}/><circle cx="26" cy="46" r="6.5" fill="#B9A6F2" ${s}/><circle cx="27" cy="58" r="6" fill="#8FD3F4" ${s}/><path d="M43 26 L50 2 L57 26 Z" fill="#F2C230" ${s}/><path d="M46 18l8-3M45 23l10-3" stroke="${O}" stroke-width="1.6"/>`;
+   face=`<ellipse cx="50" cy="59" rx="11" ry="7.5" fill="#FBE3EC"/><circle cx="46" cy="58" r="1.2" fill="${O}"/><circle cx="54" cy="58" r="1.2" fill="${O}"/>`;mouth=false}}
+ if(k==='frog'){head=`<ellipse cx="50" cy="52" rx="31" ry="22" fill="${c}" ${s}/>`;
+  ears=`<circle cx="35" cy="32" r="11" fill="${c}" ${s}/><circle cx="65" cy="32" r="11" fill="${c}" ${s}/>`;
+  top=`<circle cx="35" cy="32" r="6.5" fill="#fff"/><circle cx="65" cy="32" r="6.5" fill="#fff"/><circle cx="36" cy="33" r="3.6" fill="${O}"/><circle cx="64" cy="33" r="3.6" fill="${O}"/><circle cx="37.2" cy="31.8" r="1.2" fill="#fff"/><circle cx="65.2" cy="31.8" r="1.2" fill="#fff"/><path d="M38 56 Q50 66 62 56" fill="none" stroke="${O}" stroke-width="2.4" stroke-linecap="round"/>`;eyes=false;mouth=false;ey=48}
+ if(k==='penguin'){face=`<path d="M50 30 Q34 30 30 48 Q30 66 50 68 Q70 66 70 48 Q66 30 50 30Z" fill="${c2}"/><path d="M45 55 L55 55 L50 62Z" fill="#F2A33A" ${s}/>`;
+  arms=`<path d="M28 74 Q16 88 24 94 Q30 86 32 80Z" fill="${c}" ${s}/><path d="M72 74 Q84 88 76 94 Q70 86 68 80Z" fill="${c}" ${s}/>`;mouth=false}
+ if(k==='owl'){ears=tri('M27 34 L26 14 L42 24 Z',c)+tri('M73 34 L74 14 L58 24 Z',c);
+  face=`<circle cx="39" cy="47" r="10" fill="${c2}" ${s}/><circle cx="61" cy="47" r="10" fill="${c2}" ${s}/><path d="M46 56 L54 56 L50 63Z" fill="#F2A33A" ${s}/>`;
+  extraBody=`<path d="M42 84q4 4 8 0q4 4 8 0M44 92q3 3 6 0q3 3 6 0" fill="none" stroke="${c}" stroke-width="2.2"/>`;mouth=false}
+ if(k==='dino'){back=`<path d="M68 98 Q100 100 96 76 Q90 88 70 88Z" fill="${c}" ${s}/>`+tri('M35 26 L38 11 L47 22 Z',c2)+tri('M45 21 L50 6 L56 21 Z',c2)+tri('M55 22 L63 11 L66 27 Z',c2);
+  if(f.wings){back=`<path d="M30 74 Q2 54 8 84 Q16 78 22 88Z" fill="${c2}" ${s}/><path d="M70 74 Q98 54 92 84 Q84 78 78 88Z" fill="${c2}" ${s}/>`+back;
+   top=tri('M33 30 L27 15 L41 24 Z','#F2C230')+tri('M67 30 L73 15 L59 24 Z','#F2C230')}
+  face=`<ellipse cx="44" cy="58" rx="1.6" ry="1.2" fill="${O}"/><ellipse cx="56" cy="58" rx="1.6" ry="1.2" fill="${O}"/>`}
+ if(k==='whale'){ears='';head='';arms='';feet='';belly='';
+  bodyShape=`<path d="M82 74 L98 60 L96 84 Z" fill="${c}" ${s}/><path d="M12 68 Q12 38 50 38 Q86 38 86 68 Q86 100 50 100 Q12 100 12 68Z" fill="${c}" ${s}/><path d="M20 80 Q50 104 80 80 Q74 96 50 97 Q26 96 20 80Z" fill="${c2}"/>`;
+  back=`<path d="M50 36 Q44 24 36 20M50 36 V14M50 36 Q56 24 64 20" fill="none" stroke="#8FD3F4" stroke-width="3.5" stroke-linecap="round"/><circle cx="36" cy="18" r="3" fill="#F7A8C8"/><circle cx="50" cy="12" r="3" fill="#F2C230"/><circle cx="64" cy="18" r="3" fill="#7CC66B"/>`;ey=62;
+  if(f.dark)face=`<g fill="#FFF6C8"><circle cx="26" cy="56" r="1.6"/><circle cx="72" cy="52" r="1.4"/><circle cx="64" cy="86" r="1.6"/><circle cx="34" cy="88" r="1.3"/><circle cx="78" cy="70" r="1.2"/></g>`}
+ if(k==='mouse'){ears=`<circle cx="25" cy="27" r="13" fill="${c}" ${s}/><circle cx="75" cy="27" r="13" fill="${c}" ${s}/><circle cx="25" cy="27" r="7.5" fill="#F7B6C6"/><circle cx="75" cy="27" r="7.5" fill="#F7B6C6"/>`;
+  face=`<path d="M22 55h10M23 60l9-2M78 55H68M77 60l-9-2" stroke="${O}" stroke-width="1.8" stroke-linecap="round"/><ellipse cx="50" cy="55" rx="3" ry="2.3" fill="#F28AA0" ${s}/>`;
+  back=`<path d="M70 96 Q92 100 90 84 Q88 74 96 72" fill="none" stroke="#F7B6C6" stroke-width="3.5" stroke-linecap="round"/>`}
+ if(k==='dog'){top=`<ellipse cx="25" cy="48" rx="8" ry="17" fill="${c3}" ${s} transform="rotate(18 25 48)"/><ellipse cx="75" cy="48" rx="8" ry="17" fill="${c3}" ${s} transform="rotate(-18 75 48)"/>`;
+  face=`<ellipse cx="61" cy="45" rx="8" ry="7" fill="${c3}" opacity=".55"/><ellipse cx="50" cy="58" rx="10" ry="7.5" fill="${c2}"/>`+nose();
+  back=`<path d="M70 88 Q86 82 84 68" fill="none" stroke="${O}" stroke-width="9" stroke-linecap="round"/><path d="M70 88 Q86 82 84 68" fill="none" stroke="${c3}" stroke-width="5" stroke-linecap="round"/>`;blush=false}
+ if(k==='chick'){head='';arms=`<path d="M17 64 Q6 74 18 84 Q22 74 20 64Z" fill="${c}" ${s}/><path d="M83 64 Q94 74 82 84 Q78 74 80 64Z" fill="${c}" ${s}/>`;
+  bodyShape=`<circle cx="50" cy="66" r="34" fill="${c}" ${s}/>`;belly=`<ellipse cx="50" cy="84" rx="17" ry="11" fill="${c2}"/>`;
+  back=`<path d="M50 34 Q42 20 48 16 Q50 26 54 18 Q60 24 50 34Z" fill="${c}" ${s}/>`;ey=60;
+  face=`<path d="M45 66 L55 66 L50 73Z" fill="#F2A33A" ${s}/>`;mouth=false;feet=`<ellipse cx="40" cy="102" rx="8" ry="4.5" fill="${foot}" ${s}/><ellipse cx="60" cy="102" rx="8" ry="4.5" fill="${foot}" ${s}/>`}
+ if(k==='sheep'){for(let i=0;i<10;i++){const a=i*Math.PI/5;back+=`<circle cx="${(50+26*Math.cos(a)).toFixed(1)}" cy="${(47+25*Math.sin(a)).toFixed(1)}" r="10" fill="${c}" ${s}/>`}
+  head=`<circle cx="50" cy="47" r="24" fill="${c}"/><ellipse cx="50" cy="51" rx="18" ry="17" fill="${c2}" ${s}/>`;
+  face=`<ellipse cx="29" cy="47" rx="8" ry="4" fill="${c2}" ${s} transform="rotate(-15 29 47)"/><ellipse cx="71" cy="47" rx="8" ry="4" fill="${c2}" ${s} transform="rotate(15 71 47)"/>`;ey=49;
+  belly='';bodyShape=`<ellipse cx="50" cy="84" rx="26" ry="20" fill="${c}" ${s}/>`;arms='';blush=false}
+ if(k==='hamster'){head=`<ellipse cx="50" cy="50" rx="30" ry="25" fill="${c}" ${s}/>`;
+  ears=`<circle cx="31" cy="29" r="7" fill="${c}" ${s}/><circle cx="69" cy="29" r="7" fill="${c}" ${s}/><circle cx="31" cy="29" r="3.5" fill="#F7B6C6"/><circle cx="69" cy="29" r="3.5" fill="#F7B6C6"/>`;
+  face=`<circle cx="29" cy="59" r="10" fill="${c2}" ${s}/><circle cx="71" cy="59" r="10" fill="${c2}" ${s}/><ellipse cx="50" cy="55" rx="2.6" ry="2" fill="#F28AA0"/>`;blush=false}
+ if(k==='monkey'){ears=`<circle cx="21" cy="48" r="9" fill="${c}" ${s}/><circle cx="79" cy="48" r="9" fill="${c}" ${s}/><circle cx="21" cy="48" r="5" fill="${c2}"/><circle cx="79" cy="48" r="5" fill="${c2}"/>`;
+  face=`<g fill="${c2}"><circle cx="41" cy="46" r="10"/><circle cx="59" cy="46" r="10"/><ellipse cx="50" cy="59" rx="17" ry="11"/></g><circle cx="47.5" cy="55" r="1.3" fill="${O}"/><circle cx="52.5" cy="55" r="1.3" fill="${O}"/>`;
+  back=`<path d="M70 92 Q94 92 90 72 Q88 64 81 68" fill="none" stroke="${O}" stroke-width="8" stroke-linecap="round"/><path d="M70 92 Q94 92 90 72 Q88 64 81 68" fill="none" stroke="${c}" stroke-width="4" stroke-linecap="round"/>`}
+ if(k==='elephant'){ears=`<ellipse cx="20" cy="48" rx="15" ry="19" fill="${c}" ${s}/><ellipse cx="80" cy="48" rx="15" ry="19" fill="${c}" ${s}/><ellipse cx="21" cy="48" rx="9" ry="12" fill="#F3C9D3"/><ellipse cx="79" cy="48" rx="9" ry="12" fill="#F3C9D3"/>`;
+  top=`<path d="M45 52 Q42 70 52 76 Q60 78 59 71 Q53 70 54 62 L55 52Z" fill="${c}" ${s}/>`;ey=45;mouth=false}
+ if(k==='koala'){ears=`<circle cx="22" cy="32" r="14" fill="${c}" ${s}/><circle cx="78" cy="32" r="14" fill="${c}" ${s}/><circle cx="22" cy="32" r="8" fill="${c2}"/><circle cx="78" cy="32" r="8" fill="${c2}"/>`;
+  face=`<ellipse cx="50" cy="55" rx="6.5" ry="8.5" fill="#3B3F4E"/>`;ey=45;mouth=false}
+ if(k==='lion'){for(let i=0;i<12;i++){const a=i*Math.PI/6;back+=`<circle cx="${(50+28*Math.cos(a)).toFixed(1)}" cy="${(48+28*Math.sin(a)).toFixed(1)}" r="10" fill="${c3}" ${s}/>`}
+  back+=`<path d="M70 96 Q90 96 88 80" fill="none" stroke="${O}" stroke-width="7" stroke-linecap="round"/><path d="M70 96 Q90 96 88 80" fill="none" stroke="${c}" stroke-width="3.5" stroke-linecap="round"/><circle cx="88" cy="78" r="5" fill="${c3}" ${s}/>`;
+  ears=`<circle cx="30" cy="27" r="7" fill="${c}" ${s}/><circle cx="70" cy="27" r="7" fill="${c}" ${s}/>`;
+  face=`<ellipse cx="50" cy="58" rx="11" ry="8" fill="${c2}"/><path d="M46 53h8l-4 4z" fill="${O}"/>`}
+ if(k==='raccoon'){ears=tri('M28 34 L30 16 L44 27 Z',c)+tri('M72 34 L70 16 L56 27 Z',c);
+  face=`<path d="M25 47 Q38 37 50 46 Q62 37 75 47 Q70 55 60 53 Q50 51 40 53 Q30 55 25 47Z" fill="#3B3B48"/><ellipse cx="50" cy="59" rx="9" ry="6" fill="${c2}"/>`+nose(56);
+  back=`<ellipse cx="82" cy="82" rx="8" ry="18" fill="${c}" ${s} transform="rotate(35 82 82)"/><path d="M80 70l9 6M76 78l9 6M72 86l8 5" stroke="#3B3B48" stroke-width="3" stroke-linecap="round"/>`}
+ if(k==='octopus'){arms='';feet='';belly='';bodyShape='';
+  for(const x of [24,37,50,63,76])back+=`<path d="M${x-6} 64 Q${x-9} 92 ${x} 102 Q${x+9} 100 ${x+5} 92 Q${x+1} 82 ${x+6} 64Z" fill="${c}" ${s}/>`;
+  head=`<ellipse cx="50" cy="48" rx="30" ry="30" fill="${c}" ${s}/>`;face=`<circle cx="36" cy="30" r="4" fill="${c2}"/><circle cx="62" cy="26" r="3" fill="${c2}"/><circle cx="68" cy="38" r="3" fill="${c2}"/>`;ey=50}
+ if(k==='deer'){back=`<path d="M38 26 L32 8 M33 14 L25 10 M35 19 L28 19 M62 26 L68 8 M67 14 L75 10 M65 19 L72 19" stroke="#8A5A35" stroke-width="4" stroke-linecap="round" fill="none"/><circle cx="25" cy="10" r="3" fill="#F7A8C8"/><circle cx="75" cy="10" r="3" fill="#F7A8C8"/>`;
+  ears=`<ellipse cx="22" cy="40" rx="11" ry="6" transform="rotate(-25 22 40)" fill="${c}" ${s}/><ellipse cx="78" cy="40" rx="11" ry="6" transform="rotate(25 78 40)" fill="${c}" ${s}/>`;
+  face=`<ellipse cx="50" cy="58" rx="10" ry="7.5" fill="${c2}"/>`+nose();extraBody=`<g fill="${c2}"><circle cx="36" cy="78" r="2.5"/><circle cx="64" cy="76" r="2.2"/><circle cx="62" cy="90" r="2"/></g>`}
+ if(k==='kid'){head=`<circle cx="50" cy="47" r="29" fill="${c}" ${s}/>`;
+  face=`<ellipse cx="50" cy="53" rx="20" ry="17" fill="#FDE4D3" ${s}/><path d="M31 48 Q50 33 69 48 Q62 42 56 44 Q50 39 44 44 Q38 42 31 48Z" fill="#8A5A3C"/>`;ey=55;
+  if(f.starry)face=`<g fill="#FFF6C8"><circle cx="30" cy="34" r="1.6"/><circle cx="68" cy="28" r="1.4"/><circle cx="74" cy="56" r="1.3"/><circle cx="40" cy="88" r="1.4"/><circle cx="62" cy="96" r="1.2"/></g>`+face;
+  if(f.hood==='dino'){back=`<path d="M68 98 Q100 100 96 76 Q90 88 70 88Z" fill="${c}" ${s}/>`;ears=tri('M28 30 L26 14 L39 22 Z',c2)+tri('M41 21 L47 4 L55 19 Z',c2)+tri('M59 20 L70 9 L72 26 Z',c2)}
+  if(f.hood==='dragon'){back=`<path d="M30 74 Q2 54 8 84 Q16 78 22 88Z" fill="${c2}" ${s}/><path d="M70 74 Q98 54 92 84 Q84 78 78 88Z" fill="${c2}" ${s}/>`;ears=tri('M30 28 L24 10 L40 21 Z','#F2C230')+tri('M70 28 L76 10 L60 21 Z','#F2C230')}
+  if(f.hood==='bunny')ears=`<ellipse cx="38" cy="16" rx="7.5" ry="16" fill="${c}" ${s}/><ellipse cx="62" cy="16" rx="7.5" ry="16" fill="${c}" ${s}/><ellipse cx="38" cy="17" rx="3.5" ry="11" fill="${c2}"/><ellipse cx="62" cy="17" rx="3.5" ry="11" fill="${c2}"/>`;
+  if(f.hood==='cat')ears=tri('M25 36 L27 10 L46 24 Z',c)+tri('M75 36 L73 10 L54 24 Z',c)+`<path d="M30 30 L31 18 L40 25 Z" fill="${c2}"/><path d="M70 30 L69 18 L60 25 Z" fill="${c2}"/>`}
+ let base='',rim='';
+ if(f.base){const bc=f.bc||c2,L=limb,sprk=(x,y,col)=>`<path d="M${x} ${y}l1 3 3 1-3 1-1 3-1-3-3-1 3-1z" fill="${col}"/>`;
+  const B={
+   pudding:()=>`<path d="M28 82 H72 L66 107 H34Z" fill="${f.gold?'#FFE58A':'#FFE29A'}" ${s}/><path d="M28 82 H72 L71 89 Q50 94 29 89Z" fill="${f.gold?'#D9A21B':'#B8742E'}" ${s}/><ellipse cx="50" cy="107" rx="27" ry="4" fill="#fff" ${s}/>`,
+   cup:()=>`<path d="M27 86 L73 86 L67 108 L33 108Z" fill="${bc}" ${s}/><path d="M37 87 L39 107 M44 87 L45 107 M50 87 V107 M56 87 L55 107 M63 87 L61 107" stroke="#fff" stroke-opacity=".7" stroke-width="2"/><path d="M24 87 q4.3 -7 8.6 0 q4.3 -7 8.6 0 q4.3 -7 8.6 0 q4.3 -7 8.6 0 q4.3 -7 8.6 0 q4.3 -7 8.6 0" fill="#FFF8F0" ${s}/><circle cx="50" cy="83" r="4" fill="#E2405A" ${s}/>`,
+   tea:()=>`<path d="M78 86 q12 0 9 10 q-3 7 -13 4" fill="none" stroke="#2B2F45" stroke-width="7"/><path d="M78 86 q12 0 9 10 q-3 7 -13 4" fill="none" stroke="#fff" stroke-width="3"/><path d="M24 80 H76 Q76 106 50 106 Q24 106 24 80Z" fill="#fff" ${s}/><path d="M26 88 H74" stroke="${bc}" stroke-width="3.5"/><g fill="${bc}"><circle cx="36" cy="96" r="2"/><circle cx="50" cy="99" r="2"/><circle cx="64" cy="96" r="2"/></g><ellipse cx="50" cy="107" rx="32" ry="4" fill="${bc}" ${s}/>`,
+   cone:()=>`<path d="M29 88 L71 88 L50 111Z" fill="#E9B872" ${s}/><path d="M36 88 L56 104 M47 88 L62 99 M59 88 L67 93 M64 88 L44 104 M53 88 L38 98 M41 88 L33 93" stroke="#B9844A" stroke-width="1.6"/><path d="M27 89 q4 6 8 0 q4 6 8 0 q4 6 8 0 q4 6 8 0 q4 6 8 0 q4 6 8 0" fill="${c}" ${s}/>`,
+   donut:()=>`<ellipse cx="50" cy="93" rx="31" ry="11" fill="#E9B872" ${s}/><path d="M20 91 Q50 76 80 91 Q76 100 50 100 Q24 100 20 91Z" fill="${bc}"/><path d="M28 90l3-2M40 85l3 1M58 85l3-1M70 89l-3-2M48 95l3 0M63 95l3-1M34 95l3 1" stroke-width="2.2" stroke-linecap="round" stroke="#7FB3F5"/><path d="M38 90l2 2M54 90l3 0" stroke="#F7D046" stroke-width="2.2" stroke-linecap="round"/>`,
+   cheese:()=>`<path d="M22 88 L78 80 L78 108 L22 108Z" fill="#F7C948" ${s}/><path d="M22 88 L78 80" stroke="#E0A82E" stroke-width="3"/><g fill="#E0A82E"><circle cx="34" cy="98" r="3.5"/><circle cx="52" cy="94" r="2.5"/><circle cx="62" cy="101" r="4"/><circle cx="44" cy="104" r="2"/></g>`,
+   egg:()=>`<path d="M24 86 L30 80 L36 87 L42 80 L48 87 L54 80 L60 87 L66 80 L72 87 L76 83 Q79 110 50 110 Q21 110 24 86Z" fill="#FFFDF5" ${s}/><circle cx="36" cy="98" r="2.5" fill="#F3E3C8"/><circle cx="62" cy="102" r="2" fill="#F3E3C8"/>`,
+   cloud:()=>`<g fill="${bc}" ${s}><circle cx="26" cy="100" r="10"/><circle cx="40" cy="95" r="12"/><circle cx="60" cy="95" r="12"/><circle cx="74" cy="100" r="10"/></g><rect x="25" y="98" width="50" height="11" fill="${bc}"/><path d="M17 104 Q20 110 30 110 H70 Q80 110 83 104" fill="none" stroke="#2B2F45" stroke-width="2.6"/>`,
+   bowl:()=>`<path d="M19 86 H81 Q79 111 50 111 Q21 111 19 86Z" fill="${bc}" ${s}/><path d="M27 96 q5 -4 10 0 t10 0 t10 0 t10 0 t10 0" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="2"/><ellipse cx="50" cy="86" rx="31" ry="3.5" fill="#fff" fill-opacity=".5" ${s}/>`,
+   leaf:()=>'',
+   jelly:()=>`<path d="M25 80 H75 L71 108 H29Z" fill="#DFF1FF" fill-opacity=".8" ${s}/><g fill="#fff" stroke="#8FC8F0" stroke-width="1.4"><circle cx="36" cy="98" r="3"/><circle cx="58" cy="102" r="2.5"/><circle cx="64" cy="92" r="2"/><circle cx="44" cy="90" r="1.8"/></g><path d="M30 84 L32 104" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+   mug:()=>`<path d="M76 86 q12 0 10 9 q-2 8 -11 6" fill="none" stroke="#2B2F45" stroke-width="7"/><path d="M76 86 q12 0 10 9 q-2 8 -11 6" fill="none" stroke="${bc}" stroke-width="3"/><rect x="25" y="80" width="51" height="28" rx="6" fill="${bc}" ${s}/><g fill="#fff" stroke="#2B2F45" stroke-width="1.6"><rect x="30" y="76" width="9" height="8" rx="2"/><rect x="60" y="76" width="9" height="8" rx="2"/></g><path d="M40 94 h20" stroke="#fff" stroke-width="3" stroke-linecap="round"/>`,
+   boba:()=>`<rect x="70" y="58" width="5" height="34" rx="2" fill="#F06C9B" ${s} transform="rotate(14 72 75)"/><path d="M27 80 H73 L69 108 H31Z" fill="#E8CBA8" ${s}/><g fill="#4B3B3B"><circle cx="37" cy="102" r="3"/><circle cx="45" cy="104" r="3"/><circle cx="53" cy="102" r="3"/><circle cx="61" cy="104" r="3"/><circle cx="41" cy="97" r="3"/><circle cx="57" cy="97" r="3"/></g><path d="M27 86 H73" stroke="#fff" stroke-opacity=".6" stroke-width="2"/>`,
+   waffle:()=>`<rect x="23" y="86" width="54" height="22" rx="5" fill="#E9B872" ${s}/><path d="M32 86v22M41 86v22M50 86v22M59 86v22M68 86v22M23 93h54M23 101h54" stroke="#B9844A" stroke-width="1.6"/><rect x="44" y="82" width="12" height="7" rx="2" fill="#FFF0B0" ${s}/><path d="M50 89 q-8 8 -2 14" fill="none" stroke="#C9772E" stroke-width="3" stroke-linecap="round"/>`,
+   pancake:()=>`<ellipse cx="50" cy="103" rx="30" ry="7" fill="#C98A4B" ${s}/><ellipse cx="50" cy="97" rx="27" ry="4" fill="#7A3E3E"/><ellipse cx="50" cy="92" rx="30" ry="7" fill="#C98A4B" ${s}/><ellipse cx="50" cy="90" rx="22" ry="3.5" fill="#E2A868"/>`,
+   honeypot:()=>`<path d="M26 85 Q20 108 50 108 Q80 108 74 85Z" fill="#F2B544" ${s}/><rect x="27" y="80" width="46" height="8" rx="3" fill="#E09A2D" ${s}/><path d="M35 88 v6 q2 3 4 0 v-6 M57 88 v9 q2 3 4 0 v-9" fill="#F7D046"/><rect x="40" y="94" width="20" height="9" rx="2" fill="#FFF6DD" ${s} stroke-width="1.6"/>`,
+   tub:()=>`<path d="M30 108 l-3 4 M70 108 l3 4" stroke="#2B2F45" stroke-width="3" stroke-linecap="round"/><path d="M16 86 H84 V96 Q84 108 70 108 H30 Q16 108 16 96Z" fill="#fff" ${s}/><g fill="#EAF6FF" ${s} stroke-width="1.6"><circle cx="22" cy="84" r="6"/><circle cx="32" cy="80" r="7"/><circle cx="70" cy="80" r="7"/><circle cx="79" cy="84" r="6"/></g><path d="M20 94 H80" stroke="#9CCFEA" stroke-width="3"/>`,
+   nori:()=>`<path d="M32 90 H68 V106 H32Z" fill="#2E3B32" ${s}/>`,
+   star:()=>{let d='';for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?11:24;d+=(i?'L':'M')+(50+r*Math.cos(a)*1.3).toFixed(1)+' '+(99+r*Math.sin(a)*.55).toFixed(1)}return `<path d="${d}Z" fill="#F7D046" ${s}/>`}
+  };
+  if(f.base==='leaf')back+=`<path d="M10 106 Q50 82 92 102 Q54 118 10 106Z" fill="#7CC66B" ${s}/><path d="M18 105 Q52 96 86 102" stroke="#D8F2C9" stroke-width="2" fill="none"/>`;
+  base=(B[f.base]||(()=>''))();
+  if(!['donut','nori','leaf'].includes(f.base)){feet='';if(k!=='chick'&&k!=='penguin')rim=`<ellipse cx="29" cy="84" rx="6" ry="6.5" fill="${L}" ${s}/><ellipse cx="71" cy="84" rx="6" ry="6.5" fill="${L}" ${s}/>`}}
+ if(f.sp)top+=`<g fill="#fff" stroke="#F2A33A" stroke-width="1.2"><path d="M12 30l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/><path d="M88 22l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/><path d="M90 92l1.4 3.4 3.4 1.4-3.4 1.4-1.4 3.4-1.4-3.4-3.4-1.4 3.4-1.4z"/></g>`;
+ const ec=f.dark?'#FFF6C8':O;let e='';
+ if(eyes)e=`<circle cx="40" cy="${ey}" r="${whiteEyes?2.8:3.6}" fill="${whiteEyes?'#fff':ec}"/><circle cx="60" cy="${ey}" r="${whiteEyes?2.8:3.6}" fill="${whiteEyes?'#fff':ec}"/>`+(whiteEyes||f.dark?'':`<circle cx="41.3" cy="${ey-1.3}" r="1.2" fill="#fff"/><circle cx="61.3" cy="${ey-1.3}" r="1.2" fill="#fff"/>`);
+ const bl=blush?`<ellipse cx="32" cy="${ey+9}" rx="4.6" ry="2.8" fill="#F59AA8" opacity=".75"/><ellipse cx="68" cy="${ey+9}" rx="4.6" ry="2.8" fill="#F59AA8" opacity=".75"/>`:'';
+ const m=mouth?`<path d="M45.5 ${ey+12} Q50 ${ey+16} 54.5 ${ey+12}" fill="none" stroke="${ec}" stroke-width="2.2" stroke-linecap="round"/>`:'';
+ const [ob,of]=outfit(f,lvl!=null?lvl:(lvOf(f.id)||1),ey,s);
+ return `<svg class="${cls}" viewBox="-7 -16 114 128" aria-hidden="true"><ellipse cx="50" cy="108" rx="28" ry="3.5" fill="#000" opacity=".12"/>${ob}${back}${ears}${arms}${bodyShape}${belly}${extraBody}${feet}${base}${rim}${head}${face}${e}${bl}${m}${top}${of}</svg>`.replace(/stroke-width="2\.6" stroke-linejoin="round" stroke-width="([\d.]+)"/g,'stroke-width="$1" stroke-linejoin="round"');
+}
+/* ---------- outfits: Lv2 adds item 1, Lv3 adds item 2 + golden aura ---------- */
+const OUT={bear:['scarf','chef'],bunny:['bow','wand'],cat:['necklace','beret'],frog:['bowtie','crown'],pig:['flower','sunglasses'],mouse:['glasses','chef'],
+ dog:['bowtie','partyhat'],chick:['flower','glasses'],sheep:['flower','headphones'],hamster:['scarf','partyhat'],monkey:['headphones','sunglasses'],elephant:['glasses','partyhat'],
+ penguin:['scarf','headphones'],panda:['sunglasses','scarf'],fox:['necklace','cape'],owl:['glasses','wizard'],koala:['bow','headphones'],lion:['necklace','crown'],
+ tiger:['scarf','sunglasses'],raccoon:['chef','bowtie'],octopus:['bow','glasses'],dino:['partyhat','cape'],whale:['partyhat','sunglasses'],uni:['necklace','halo'],
+ deer:['scarf','wand'],dragon:['sunglasses','cape'],gold:['cape','crown'],nightwhale:['wizard','halo'],rainbunny:['flower','halo'],galaxycat:['wizard','cape']};
+const ACCN={scarf:'圍巾',bowtie:'領結',necklace:'珍珠項鍊',bow:'蝴蝶結',flower:'小花',crown:'皇冠',partyhat:'派對帽',chef:'廚師帽',beret:'貝雷帽',wizard:'魔法帽',halo:'天使光環',glasses:'圓眼鏡',sunglasses:'墨鏡',headphones:'耳機',wand:'魔法棒',cape:'英雄披風'};
+const ANC={kid:{t:20},frog:{t:20},chick:{t:33,n:80},sheep:{t:15},hamster:{t:26},lion:{t:12},whale:{t:40,n:0},octopus:{t:19,n:0}};
+const ACC={
+ scarf:(t,n,ey,s)=>['',`<path d="M29 ${n-5} Q50 ${n+5} 71 ${n-5} L71 ${n+3} Q50 ${n+13} 29 ${n+3}Z" fill="#E25D5D" ${s}/><path d="M59 ${n+5} l3 15 l8-2 l-4-14z" fill="#E25D5D" ${s}/><path d="M33 ${n} Q50 ${n+9} 67 ${n}" stroke="#fff" stroke-width="2" fill="none" stroke-dasharray="3 4"/>`],
+ bowtie:(t,n,ey,s)=>['',`<path d="M50 ${n+2} l-12 -7 v14z M50 ${n+2} l12 -7 v14z" fill="#3D6BE0" ${s}/><circle cx="50" cy="${n+2}" r="3.2" fill="#2B4FB0" ${s}/>`],
+ necklace:(t,n)=>{let g='';for(let i=0;i<9;i++){const x=34+i*4,y=n-2+Math.sin(i/8*Math.PI)*7;g+=`<circle cx="${x}" cy="${y.toFixed(1)}" r="2.4" fill="#fff" stroke="#B9A6F2" stroke-width="1"/>`}return['',g+`<circle cx="50" cy="${n+7}" r="3.5" fill="#F7A8C8" stroke="#2B2F45" stroke-width="1.5"/>`]},
+ bow:(t,n,ey,s)=>['',`<path d="M67 ${t+7} l-10 -7 v14z M67 ${t+7} l10 -7 v14z" fill="#F7A8C8" ${s}/><circle cx="67" cy="${t+7}" r="3" fill="#F06C9B" ${s}/>`],
+ flower:(t,n,ey,s)=>['',`<g ${s} stroke-width="1.6" fill="#F7A8C8"><circle cx="33" cy="${t+2}" r="4.5"/><circle cx="40" cy="${t+6}" r="4.5"/><circle cx="37" cy="${t+13}" r="4.5"/><circle cx="29" cy="${t+13}" r="4.5"/><circle cx="26" cy="${t+6}" r="4.5"/></g><circle cx="33" cy="${t+8}" r="3.5" fill="#F2C230" ${s} stroke-width="1.4"/>`],
+ crown:(t,n,ey,s)=>['',`<path d="M36 ${t+5} L35 ${t-11} L43 ${t-3} L50 ${t-15} L57 ${t-3} L65 ${t-11} L64 ${t+5}Z" fill="#F2C230" ${s}/><circle cx="50" cy="${t-1}" r="2.6" fill="#E25D5D"/><circle cx="41" cy="${t+1}" r="1.8" fill="#3D6BE0"/><circle cx="59" cy="${t+1}" r="1.8" fill="#3D6BE0"/>`],
+ partyhat:(t,n,ey,s)=>['',`<path d="M38 ${t+5} L50 ${t-22} L62 ${t+5}Z" fill="#7FB3F5" ${s}/><path d="M42 ${t-3} L58 ${t+1} M46 ${t-12} L55 ${t-9}" stroke="#F7D046" stroke-width="3"/><circle cx="50" cy="${t-23}" r="4.2" fill="#F7A8C8" ${s}/>`],
+ chef:(t,n,ey,s)=>['',`<path d="M38 ${t-4} Q30 ${t-10} 35 ${t-18} Q38 ${t-26} 46 ${t-22} Q50 ${t-30} 56 ${t-22} Q64 ${t-26} 66 ${t-17} Q70 ${t-9} 62 ${t-4}Z" fill="#fff" ${s}/><rect x="38" y="${t-5}" width="24" height="10" rx="2" fill="#fff" ${s}/>`],
+ beret:(t,n,ey,s)=>['',`<ellipse cx="53" cy="${t}" rx="18" ry="7" fill="#E25D5D" ${s} transform="rotate(-12 53 ${t})"/><path d="M53 ${t-7} l1 -5" stroke="#2B2F45" stroke-width="2.5" stroke-linecap="round"/>`],
+ wizard:(t,n,ey,s)=>['',`<path d="M38 ${t+4} L55 ${t-28} Q58 ${t-31} 60 ${t-27} L62 ${t+4}Z" fill="#6A4FB8" ${s}/><path d="M30 ${t+5} Q50 ${t+12} 70 ${t+5} Q50 ${t-1} 30 ${t+5}Z" fill="#6A4FB8" ${s}/><path d="M51 ${t-10}l1.5 3 3.3.4-2.4 2.3.6 3.3-3-1.6-3 1.6.6-3.3-2.4-2.3 3.3-.4z" fill="#F2C230"/>`],
+ halo:(t)=>['',`<ellipse cx="50" cy="${t-12}" rx="15" ry="4.5" fill="none" stroke="#2B2F45" stroke-width="5.5"/><ellipse cx="50" cy="${t-12}" rx="15" ry="4.5" fill="none" stroke="#F7D046" stroke-width="3"/>`],
+ glasses:(t,n,ey)=>['',`<g fill="#fff" fill-opacity=".25" stroke="#2B2F45" stroke-width="2.4"><circle cx="40" cy="${ey}" r="7.5"/><circle cx="60" cy="${ey}" r="7.5"/></g><path d="M47.5 ${ey}h5" stroke="#2B2F45" stroke-width="2.4"/>`],
+ sunglasses:(t,n,ey)=>['',`<path d="M30 ${ey-5}h18v4q0 7-9 7q-9 0-9-7z M52 ${ey-5}h18v4q0 7-9 7q-9 0-9-7z" fill="#2B2F45"/><path d="M48 ${ey-3}h4" stroke="#2B2F45" stroke-width="2.5"/><path d="M33 ${ey-3}h4M55 ${ey-3}h4" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>`],
+ headphones:(t,n,ey,s)=>['',`<path d="M22 ${ey} Q22 ${t-7} 50 ${t-7} Q78 ${t-7} 78 ${ey}" fill="none" stroke="#2B2F45" stroke-width="5"/><rect x="16" y="${ey-8}" width="11" height="16" rx="4" fill="#F05A5A" ${s}/><rect x="73" y="${ey-8}" width="11" height="16" rx="4" fill="#F05A5A" ${s}/>`],
+ wand:(t,n,ey,s)=>['',`<path d="M78 100 L88 72" stroke="#8A5A35" stroke-width="3.5" stroke-linecap="round"/><path d="M89 60l2.6 5.4 5.9.8-4.3 4.1 1 5.8-5.2-2.8-5.2 2.8 1-5.8-4.3-4.1 5.9-.8z" fill="#F7D046" ${s}/>`],
+ cape:(t,n,ey,s)=>[`<path d="M30 ${(n||74)-6} Q16 92 22 106 L78 106 Q84 92 70 ${(n||74)-6}Z" fill="#E25D5D" ${s}/><path d="M24 104 L76 104" stroke="#F2C230" stroke-width="3"/>`,'']
+};
+function outfit(f,L,ey,s){const a=Object.assign({t:22,n:74},ANC[f.kind]||{});let back='',front='';
+ if(L>=3){back+=`<circle cx="50" cy="60" r="48" fill="#FFE07A" opacity=".32"/>`;
+  front+=`<g fill="#F7D046" stroke="#B8860B" stroke-width="1"><path d="M8 62l1.6 4 4 1.6-4 1.6-1.6 4-1.6-4-4-1.6 4-1.6z"/><path d="M92 44l1.4 3.4 3.4 1.4-3.4 1.4-1.4 3.4-1.4-3.4-3.4-1.4 3.4-1.4z"/><path d="M14 98l1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2 3-1.2z"/></g>`}
+ for(const it of (OUT[f.id]||[]).slice(0,Math.max(0,L-1))){if((it==='scarf'||it==='bowtie'||it==='necklace')&&!a.n)continue;const r=ACC[it](a.t,a.n,ey,s);back+=r[0];front+=r[1]}
+ return[back,front]}
+const lvOf=id=>(S.lv&&S.lv[id])||0;
+const boxSvg=cls=>`<svg class="${cls}" viewBox="0 0 120 120" aria-hidden="true"><g class="body"><rect x="20" y="58" width="80" height="58" rx="6" fill="var(--blue)" stroke="var(--ink)" stroke-width="3"/><text x="60" y="103" text-anchor="middle" font-family="Baloo 2, Arial Rounded MT Bold, sans-serif" font-weight="800" font-size="42" fill="#fff">?</text><circle cx="33" cy="70" r="3" fill="#fff" opacity=".7"/><circle cx="88" cy="105" r="3" fill="#fff" opacity=".7"/><circle cx="86" cy="70" r="2" fill="#fff" opacity=".7"/></g><g class="lid"><rect x="13" y="40" width="94" height="20" rx="5" fill="var(--pencil)" stroke="var(--ink)" stroke-width="3"/><path d="M60 40c-8-20-32-18-22-2M60 40c8-20 32-18 22-2" fill="none" stroke="var(--ink)" stroke-width="3.5" stroke-linecap="round"/></g></svg>`;
+
+/* ---------- figure actions: 30 animations ---------- */
+const ACTS={
+ squish:['.7s','50% 100%','30%{transform:scale(1.15,.85)}60%{transform:scale(.92,1.08)}'],
+ hop3:['1s','50% 100%','0%,33%,66%,100%{transform:translateY(0)}16%,50%,83%{transform:translateY(-26px)}'],
+ sleepy:['1.6s','50% 100%','30%,75%{transform:rotate(-12deg) translateY(4px)}'],
+ jump:['.8s','50% 100%','15%{transform:scale(1.1,.88)}45%{transform:translateY(-60px) scale(.95,1.06)}80%{transform:translateY(0) scale(1.12,.9)}'],
+ roll:['1.2s','50% 55%','50%{transform:translateX(50px) rotate(360deg)}100%{transform:translateX(0) rotate(720deg)}'],
+ shiver:['.7s','50% 100%','10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}'],
+ wag:['.9s','50% 100%','15%,45%,75%{transform:rotate(-12deg)}30%,60%,90%{transform:rotate(12deg)}'],
+ peck:['.9s','50% 100%','15%,55%{transform:rotate(22deg) translateY(8px)}35%,75%{transform:rotate(0)}'],
+ jelly:['.9s','50% 100%','25%{transform:scale(1.25,.78)}50%{transform:scale(.85,1.15)}75%{transform:scale(1.08,.94)}'],
+ puff:['1s','50% 60%','30%,70%{transform:scale(1.3,1.05)}'],
+ dance:['1.2s','50% 100%','20%{transform:rotate(-15deg) translateX(-12px)}40%{transform:translateY(-14px)}60%{transform:rotate(15deg) translateX(12px)}80%{transform:translateY(-8px)}'],
+ stretch:['.9s','50% 100%','40%,60%{transform:scale(.88,1.28)}'],
+ slide:['1.3s','50% 100%','25%{transform:translateX(-50px) rotate(-12deg)}75%{transform:translateX(50px) rotate(12deg)}'],
+ tumble:['1s','50% 55%','50%{transform:translateY(-50px) rotate(180deg)}100%{transform:rotate(360deg)}'],
+ spin:['1.1s','50% 60%','100%{transform:rotate(-1080deg)}'],
+ headturn:['1.2s','50% 70%','20%,35%{transform:rotate(-30deg)}60%,75%{transform:rotate(30deg)}'],
+ sway:['2s','50% 100%','25%{transform:rotate(-8deg) translateX(-6px)}75%{transform:rotate(8deg) translateX(6px)}'],
+ roar:['1s','50% 100%','20%{transform:scale(1.32)}40%{transform:scale(1.28) rotate(-4deg)}60%{transform:scale(1.28) rotate(4deg)}'],
+ pounce:['1s','50% 100%','30%{transform:scale(1.12,.78)}60%{transform:translate(20px,-45px) rotate(12deg)}85%{transform:translate(30px,0) scale(1.05,.95)}'],
+ scrub:['1s','50% 80%','10%,30%,50%,70%,90%{transform:rotate(-7deg) scale(.97)}20%,40%,60%,80%{transform:rotate(7deg) scale(.97)}'],
+ swim:['1.4s','50% 50%','25%{transform:translate(-14px,-20px) rotate(-8deg)}50%{transform:translateY(-6px)}75%{transform:translate(14px,-20px) rotate(8deg)}'],
+ stomp:['1.2s','50% 100%','15%,55%{transform:translateY(-22px) rotate(-4deg)}30%,70%{transform:translateY(0) scale(1.15,.85)}'],
+ floaty:['1.6s','50% 100%','50%{transform:translateY(-36px) rotate(-5deg)}'],
+ zoomspin:['1.2s','50% 55%','50%{transform:scale(1.35) rotate(180deg)}100%{transform:rotate(360deg)}'],
+ flip:['1.1s','50% 100%','50%{transform:perspective(400px) rotateY(180deg) translateY(-14px)}100%{transform:perspective(400px) rotateY(360deg)}'],
+ lunge:['1s','50% 100%','30%{transform:translateX(-18px) scale(.95,1.05)}55%{transform:translateX(26px) scale(1.12)}'],
+ glow:['1.4s','50% 100%','50%{transform:translateY(-14px) scale(1.08);filter:brightness(1.35) drop-shadow(0 0 18px #F2C230)}'],
+ swimwave:['1.8s','50% 60%','25%{transform:translate(-24px,-14px) rotate(-8deg)}75%{transform:translate(24px,-14px) rotate(8deg)}'],
+ hophigh:['1.1s','50% 100%','15%{transform:scale(1.1,.85)}50%{transform:translateY(-80px) rotate(-12deg)}85%{transform:translateY(0) scale(1.08,.92)}'],
+ floatspin:['1.8s','50% 55%','50%{transform:translateY(-34px) rotate(180deg) scale(1.1)}100%{transform:rotate(360deg)}']
+};
+(function(){let css='';for(const[k,[d,o,kf]]of Object.entries(ACTS))css+=`@keyframes a-${k}{${kf}}.sheet .fig-big.a-${k} .fig{animation:a-${k} ${d} ease-in-out;transform-origin:${o}}`;
+ const st=document.createElement('style');st.textContent=css;document.head.appendChild(st)})();
+
+/* particles (24×24 shapes) */
+const RB=['#F7A8C8','#F2C230','#7CC66B','#8FD3F4','#B9A6F2'];
+const PT={
+ heart:()=>`<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z" fill="#F0667A"/>`,
+ carrot:()=>`<path d="M14 7L5 21l13-8z" fill="#F28C38" stroke="#2B2F45" stroke-width="1.2"/><path d="M15 8l3-5M16 9l5-2M14 7l1-5" stroke="#5DB65A" stroke-width="2" stroke-linecap="round"/>`,
+ zzz:()=>`<text x="12" y="19" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="18" fill="#7C8CC4">Z</text>`,
+ leaf:()=>`<ellipse cx="12" cy="12" rx="9" ry="7" fill="#5DB65A"/><path d="M12 12L4 8" stroke="#D8F2C9" stroke-width="1.5"/>`,
+ mud:()=>`<path d="M5 14q-1-6 5-6q2-4 6-1q5 0 3 6q2 5-4 5q-3 3-6 0q-5 1-4-4z" fill="#8A5A35"/>`,
+ cheese:()=>`<path d="M3 18L20 6v12z" fill="#F7C948" stroke="#2B2F45" stroke-width="1.2"/><circle cx="14" cy="14" r="1.8" fill="#E0A82E"/><circle cx="18" cy="11" r="1.2" fill="#E0A82E"/>`,
+ bone:()=>`<path d="M7 9a2.5 2.5 0 1 1 3-3l7 7a2.5 2.5 0 1 1 3 3 2.5 2.5 0 1 1-3 3l-7-7a2.5 2.5 0 1 1-3-3z" fill="#fff" stroke="#2B2F45" stroke-width="1.2"/>`,
+ seed:()=>`<circle cx="8" cy="12" r="2.4" fill="#E8C27A"/><circle cx="15" cy="9" r="2" fill="#E8C27A"/><circle cx="15" cy="16" r="2.2" fill="#E8C27A"/>`,
+ wool:()=>`<g fill="#fff" stroke="#B9B4A8" stroke-width="1"><circle cx="8" cy="13" r="5"/><circle cx="14" cy="10" r="6"/><circle cx="17" cy="15" r="4.5"/></g>`,
+ sunseed:()=>`<path d="M12 3q6 8 0 18q-6-10 0-18z" fill="#4B4453"/><path d="M12 5v14" stroke="#EDE6D6" stroke-width="1.4"/>`,
+ banana:()=>`<path d="M4 8q2 12 16 10q-2-2-4-2q-8 0-10-9z" fill="#F7D046" stroke="#2B2F45" stroke-width="1.2"/>`,
+ drop:()=>`<path d="M12 3q7 9 7 13a7 7 0 0 1-14 0q0-4 7-13z" fill="#6FB7F0"/>`,
+ rdrop:()=>`<path d="M12 3q7 9 7 13a7 7 0 0 1-14 0q0-4 7-13z" fill="${RB[rnd(0,4)]}"/>`,
+ snow:()=>`<path d="M12 3v18M4.2 7.5l15.6 9M4.2 16.5l15.6-9" stroke="#8FD3F4" stroke-width="2.2" stroke-linecap="round"/>`,
+ bamboo:()=>`<path d="M3 20Q10 6 21 3Q16 14 3 20z" fill="#3E9A4B"/>`,
+ sparkle:()=>`<path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z" fill="#F5A33A"/>`,
+ star:()=>`<path d="M12 2.6l2.9 6 6.6.8-4.9 4.6 1.3 6.5L12 17.3l-5.9 3.2 1.3-6.5L2.5 9.4l6.6-.8z" fill="#F2C230" stroke="#2B2F45" stroke-width="1"/>`,
+ rstar:()=>`<path d="M12 2l2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z" fill="${RB[rnd(0,4)]}"/>`,
+ gumleaf:()=>`<ellipse cx="12" cy="12" rx="6" ry="9" fill="#9CCFA4" transform="rotate(30 12 12)"/>`,
+ burst:()=>`<path d="M4 8q4 4 0 8M10 5q6 7 0 14M16 3q8 9 0 18" fill="none" stroke="#C8742E" stroke-width="2.2" stroke-linecap="round"/>`,
+ paw:()=>`<g fill="#F29A38"><ellipse cx="12" cy="15" rx="5" ry="4.2"/><circle cx="6" cy="9" r="2.2"/><circle cx="10" cy="6" r="2.2"/><circle cx="14" cy="6" r="2.2"/><circle cx="18" cy="9" r="2.2"/></g>`,
+ bubble:()=>`<circle cx="12" cy="12" r="8" fill="#DDF1FF" fill-opacity=".6" stroke="#6FB7F0" stroke-width="1.6"/><circle cx="9" cy="9" r="2" fill="#fff"/>`,
+ ink:()=>`<path d="M6 12q-2-7 6-7q8-1 6 7q3 6-6 6q-8 1-6-6z" fill="#4B3B6B"/>`,
+ rock:()=>`<path d="M4 16l3-8 7-3 6 6-2 8-9 1z" fill="#9AA1AE" stroke="#2B2F45" stroke-width="1.2"/>`,
+ petal:()=>`<g fill="#F7A8C8"><circle cx="12" cy="6" r="4"/><circle cx="18" cy="11" r="4"/><circle cx="15" cy="18" r="4"/><circle cx="9" cy="18" r="4"/><circle cx="6" cy="11" r="4"/></g><circle cx="12" cy="12.5" r="3" fill="#F2C230"/>`,
+ flame:()=>`<path d="M12 2q8 8 6 14a6 6 0 0 1-12 0q-1-5 3-8q0 4 3 4q-2-5 0-10z" fill="#F57A3A"/><path d="M12 12q4 3 2 7a3 3 0 0 1-5-1q0-3 3-6z" fill="#F7D046"/>`,
+ coin:()=>`<circle cx="12" cy="12" r="9" fill="#F2C230" stroke="#B8860B" stroke-width="1.6"/><path d="M12 7l1.5 3.2 3.4.4-2.5 2.3.7 3.3-3.1-1.7-3.1 1.7.7-3.3-2.5-2.3 3.4-.4z" fill="#FFF0B8"/>`,
+ tinystar:()=>`<path d="M12 4l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill="#FFF6C8" stroke="#8FD3F4" stroke-width="1"/>`,
+ arc:()=>`<g fill="none" stroke-width="2.4"><path d="M3 18a9 9 0 0 1 18 0" stroke="#F0667A"/><path d="M6 18a6 6 0 0 1 12 0" stroke="#F2C230"/><path d="M9 18a3 3 0 0 1 6 0" stroke="#6FB7F0"/></g>`,
+ planet:()=>`<circle cx="12" cy="12" r="6" fill="#B9A6F2"/><ellipse cx="12" cy="12" rx="11" ry="3.5" fill="none" stroke="#F2C230" stroke-width="1.8" transform="rotate(-20 12 12)"/>`
+};
+function spawnParts(host,kind){const n=7;for(let i=0;i<n;i++){const p=document.createElementNS('http://www.w3.org/2000/svg','svg');p.setAttribute('viewBox','0 0 24 24');p.setAttribute('class','heart');
+ p.innerHTML=(PT[kind]||PT.heart)();p.style.setProperty('--dx',((i-(n-1)/2)*34+rnd(-10,10))+'px');p.style.setProperty('--rot',rnd(-90,90)+'deg');p.style.animationDelay=(i*.07)+'s';host.appendChild(p);setTimeout(()=>p.remove(),1600)}}
+
+/* figure sounds */
+function sweep(f1,f2,t0,d,type='sine',v=.14){const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime+t0;o.type=type;o.frequency.setValueAtTime(f1,t);o.frequency.exponentialRampToValueAtTime(f2,t+d);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d+.02)}
+const SND={
+ boing:()=>{sweep(300,700,0,.15);sweep(700,420,.15,.2)},
+ hop:()=>[0,.33,.66].forEach((t,i)=>sweep(400+i*120,900+i*120,t,.12,'triangle')),
+ purr:()=>{for(let i=0;i<14;i++)tone(i%2?95:120,i*.07,.07,'sawtooth',.05)},
+ ribbit:()=>{sweep(260,180,0,.12,'square',.08);sweep(260,170,.18,.14,'square',.08)},
+ oink:()=>{sweep(220,140,0,.18,'sawtooth',.09);sweep(240,150,.25,.2,'sawtooth',.09)},
+ squeak:()=>{sweep(1800,2600,0,.08);sweep(1900,2800,.12,.08);sweep(2000,3000,.24,.1)},
+ bark:()=>{sweep(420,220,0,.12,'square',.09);sweep(440,230,.2,.14,'square',.09)},
+ tweet:()=>[0,.15,.3].forEach(t=>sweep(2200,3000,t,.09)),
+ baa:()=>{for(let i=0;i<8;i++)tone(i%2?310:290,i*.07,.08,'sawtooth',.06)},
+ nom:()=>[0,.12,.24,.36].forEach(t=>tone(620,t,.06,'square',.07)),
+ ooh:()=>{sweep(300,800,0,.35);sweep(400,900,.4,.3)},
+ trumpet:()=>sweep(220,520,0,.55,'sawtooth',.1),
+ whistle:()=>sweep(1600,600,0,.6),
+ tumble:()=>[0,.1,.2,.3,.4].forEach((t,i)=>tone(900-i*120,t,.08,'triangle',.1)),
+ swoosh:()=>{sweep(300,1400,0,.3,'triangle');sweep(1400,300,.35,.3,'triangle')},
+ hoot:()=>{tone(420,0,.25,'sine',.15);tone(360,.3,.35,'sine',.15)},
+ yawn:()=>sweep(520,240,0,.9,'sine',.12),
+ roar:()=>sweep(160,90,0,.7,'sawtooth',.12),
+ growl:()=>{sweep(200,140,0,.2,'square',.08);sweep(500,900,.3,.15,'triangle')},
+ splash:()=>{for(let i=0;i<8;i++)tone(1200+Math.random()*1200,i*.05,.05,'sine',.06)},
+ bloop:()=>{sweep(300,700,0,.15);sweep(700,250,.18,.2)},
+ thump:()=>[0,.45].forEach(t=>sweep(110,50,t,.25,'sine',.25)),
+ spout:()=>sweep(200,1600,0,.6,'triangle',.1),
+ chime:()=>[1568,1976,2349,3136].forEach((f,i)=>tone(f,i*.1,.5,'sine',.08)),
+ bell:()=>[0,.25,.5].forEach(t=>{tone(1568,t,.4,'triangle',.08);tone(2093,t,.4,'sine',.05)}),
+ fwoosh:()=>sweep(90,500,0,.5,'sawtooth',.1),
+ coins:()=>[0,.1,.2,.3,.4].forEach(t=>{tone(988,t,.06,'square',.06);tone(1319,t+.05,.15,'square',.06)}),
+ song:()=>{sweep(300,520,0,.7);sweep(520,260,.7,.8)},
+ magic:()=>[784,988,1175,1568,1976].forEach((f,i)=>tone(f,i*.07,.35,'sine',.1)),
+ space:()=>{sweep(400,900,0,.5);sweep(900,350,.5,.6);tone(1760,.2,.3,'sine',.05)}
+};
+function figSound(k){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();(SND[k]||SND.boing)()}catch(e){}}
+
+/* ---------- levels ---------- */
+function hasCarry(a,b){const A=digits(a),B=digits(b);let c=0,any=false;for(let i=0;i<Math.max(A.length,B.length);i++){const s=(A[i]||0)+(B[i]||0)+c;c=s>=10?1:0;if(c)any=true}return any}
+function hasBorrow(a,b){const A=digits(a),B=digits(b);let br=0,any=false;for(let i=0;i<A.length;i++){const d=A[i]-br-(B[i]||0);if(d<0){any=true;br=1}else br=0}return any}
+function genAdd(len,need){for(let t=0;t<500;t++){const a=rnd(10**(len-1),10**len-1),b=len===2?rnd(10,99):rnd(10,999);if(a+b>=10**len)continue;if(hasCarry(a,b)===need)return{op:'+',a,b}}return{op:'+',a:38,b:25}}
+function genSub(len,need,zeroBias){for(let t=0;t<500;t++){let a=rnd(10**(len-1),10**len-1);if(zeroBias&&Math.random()<.35)a=rnd(1,9)*100+rnd(0,9);if(a<=20)continue;const b=len===2?rnd(10,a-1):(Math.random()<.7&&a>110?rnd(100,a-1):rnd(10,Math.min(99,a-1)));if(hasBorrow(a,b)===need)return{op:'-',a,b}}return{op:'-',a:52,b:17}}
+function genAddUp(){for(let t=0;t<500;t++){const a=rnd(20,99),b=rnd(20,99);if(a+b>=100&&a+b<=198)return{op:'+',a,b}}return{op:'+',a:85,b:47}}
+function genSubDown(){for(let t=0;t<500;t++){let a,b;if(Math.random()<.6){a=rnd(100,199);b=rnd(10,99)}else{a=rnd(101,999);b=rnd(Math.max(100,a-99),a-10)}const r=a-b;if(r>=10&&r<=99&&hasBorrow(a,b))return{op:'-',a,b}}return{op:'-',a:112,b:58}}
+const LEVELS=[
+ {id:'a1',mult:1,after:null,name:'加法練習',desc:'兩位數，不用進位',ex:'23 + 14',gen:()=>genAdd(2,false)},
+ {id:'s1',mult:1,after:'a1',name:'減法練習',desc:'兩位數，不用借位',ex:'47 − 23',gen:()=>genSub(2,false)},
+ {id:'a2',mult:1.5,after:'s1',name:'進位加法',desc:'個位滿 10，進 1 到十位',ex:'38 + 25',gen:()=>genAdd(2,true)},
+ {id:'s2',mult:1.5,after:'a2',name:'借位減法',desc:'個位不夠減，向十位借 1',ex:'52 − 17',gen:()=>genSub(2,true)},
+ {id:'a2h',mult:1.5,after:'s2',name:'進位變百位',desc:'兩位數相加，答案變成三位數',ex:'85 + 47 = 132',gen:genAddUp},
+ {id:'s2h',mult:2,after:'a2h',name:'百位不見了',desc:'三位數相減，答案只剩兩位數',ex:'112 − 58 = 54',gen:genSubDown},
+ {id:'a3',mult:2,after:'s2',name:'三位數加法',desc:'可能連續進位好幾次',ex:'267 + 158',gen:()=>genAdd(3,true)},
+ {id:'s3',mult:2,after:'a3',name:'三位數減法',desc:'有 0 也要會借，最有挑戰！',ex:'403 − 158',gen:()=>genSub(3,true,true)},
+ {id:'mx',mult:4,after:'s3',name:'大魔王混合關',desc:'所有題型混在一起，最難也最多星星',ex:'? ± ?',gen:()=>[()=>genAdd(2,true),()=>genSub(2,true),genAddUp,genSubDown,()=>genAdd(3,true),()=>genSub(3,true,true)][rnd(0,5)]()}
+];
+const PER=5, KEY='zhishi-v1';
+const TITLES=[[0,'新手小鉛筆'],[20,'計算小學徒'],[60,'進位小勇士'],[140,'借位小高手'],[240,'直式大師']];
+const reward=(L,r)=>r?Math.round([0,2,3,4][r]*L.mult):0;
+const rateOf=m=>m<=1?3:m<=4?2:1;
+const SHELF=['木頭公仔櫃','點燈公仔櫃','星空公仔櫃','黃金公仔櫃'];
+
+/* ---------- state ---------- */
+let S={best:{},unlockAll:false,sound:true,earned:null,spent:0,owned:[],lv:{},pity:0,boxes:0,lastClearDay:'',dayStreak:0};
+try{Object.assign(S,JSON.parse(localStorage.getItem(KEY))||{})}catch(e){}
+if(typeof S.earned!=='number')S.earned=Object.values(S.best).reduce((s,v)=>s+v,0);
+if(!Array.isArray(S.owned))S.owned=[];
+S.owned=S.owned.filter(id=>FIGS.some(f=>f.id===id));
+if(!S.lv||typeof S.lv!=='object')S.lv={};S.owned.forEach(id=>{if(!S.lv[id])S.lv[id]=1});
+delete S.gifts;delete S.coupons;
+function migrate(o){if((o.v||1)>=2)return o;const oldBal=(o.earned||0)-(o.spent||0);o.spent=Math.floor((o.spent||0)/5);o.earned=o.spent+Math.ceil(Math.max(0,oldBal)/5);
+ for(const k in (o.best||{})){const t=o.best[k];o.best[k]=t>3?(t>=14?3:t>=10?2:1):t}o.v=2;return o}
+migrate(S);
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const bal=()=>S.earned-S.spent;
+const owned=id=>S.owned.includes(id);
+const titleOf=e=>TITLES.filter(t=>e>=t[0]).pop()[1];
+const nextTitle=e=>TITLES.find(t=>t[0]>e);
+const regOwned=()=>REG.filter(f=>owned(f.id)).length;
+const shelfLv=()=>{const n=regOwned();return n>=REG.length?3:n>=14?2:n>=7?1:0};
+const leftFigs=()=>FIGS.filter(f=>lvOf(f.id)<3);
+function boxPrice(){const n=S.boxes||0;return n===0?3:n<6?6:n<15?8:n<30?10:12}
+function hidChance(){const regLeft=REG.some(f=>lvOf(f.id)<3),hidLeft=HID.some(f=>lvOf(f.id)<3);
+ if(!hidLeft)return 0;if(!regLeft||S.pity>=9)return 1;return Math.min(1,.08+.04*S.pity)}
+let G=null,P=null;
+
+/* ---------- sound ---------- */
+let ac=null;
+function tone(f,t0,d,type='sine',v=.15){const o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=f;g.gain.setValueAtTime(v,ac.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+t0+d);o.connect(g).connect(ac.destination);o.start(ac.currentTime+t0);o.stop(ac.currentTime+t0+d+.02)}
+function sfx(k,x){if(!S.sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+ if(k==='good'){tone(660,0,.12);tone(880,.08,.16)}
+ else if(k==='bad'){tone(220,0,.22,'triangle',.18)}
+ else if(k==='swoop'){tone(500,0,.1,'triangle');tone(700,.07,.1,'triangle');tone(900,.14,.12,'triangle')}
+ else if(k==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,i*.09,.22))}
+ else if(k==='tick'){tone(800+(x||0)*30,0,.06,'square',.06)}
+ else if(k==='coin'){tone(988,0,.08,'square',.08);tone(1319,.08,.25,'square',.08)}
+ else if(k==='rattle'){for(let i=0;i<(x||9);i++)tone(180+Math.random()*80,i*.1,.06,'triangle',.12)}
+ else if(k==='magic'){[784,988,1175,1568,1976].forEach((f,i)=>tone(f,i*.07,.35,'sine',.1))}
+ else if(k==='boing'){const o=ac.createOscillator(),g=ac.createGain(),t=ac.currentTime;o.frequency.setValueAtTime(300,t);o.frequency.exponentialRampToValueAtTime(700,t+.15);o.frequency.exponentialRampToValueAtTime(420,t+.3);g.gain.setValueAtTime(.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.36);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+.38)}
+ else if(k==='fanfare'){[523,659,784,659,784,1047].forEach((f,i)=>tone(f,i*.12,.3,'triangle',.18))}
+}catch(e){}}
+function syncSound(){$('soundBtn').textContent='聲音：'+(S.sound?'開':'關')}
+$('soundBtn').onclick=()=>{S.sound=!S.sound;save();syncSound()};
+
+/* ---------- home ---------- */
+function show(v){['home','play','cnplay','done','shop'].forEach(x=>$(x).hidden=x!==v);window.scrollTo({top:0})}
+const rating=t=>t||0;
+const unlocked=i=>{const L=LEVELS[i];return S.unlockAll||!L.after||(S.best[L.after]||0)>0||(S.best[L.id]||0)>0};
+function syncBal(){$('balTop').textContent=bal()}
+function goalText(b){if(!leftFigs().length)return '全部公仔都升到 Lv3 了，你是公仔大師！';const p=boxPrice();
+ return b>=p?`可以抽盲盒了！（一個 ${p} 顆星）`:`再 <b>${p-b}</b> 顆星就能抽下一個盲盒`}
+const goalPct=b=>leftFigs().length?Math.min(100,b/boxPrice()*100):100;
+function renderHome(){
+ syncBal();$('unlockAll').checked=S.unlockAll;$('chal').checked=!!S.challenge;$('chal').closest('.chal').classList.toggle('on',!!S.challenge);const b=bal(),nt=nextTitle(S.earned);
+ $('bankCard').innerHTML=`<svg class="jar"><use href="#jar"/></svg><div><div class="tag">星星存錢筒</div><div class="bank-n">${b}</div></div>
+  <div class="bank-r"><div><span class="title-chip">${titleOf(S.earned)}</span>${S.dayStreak>1&&(S.lastClearDay===today()||S.lastClearDay===yesterday())?`<span class="title-chip">連續練習 ${S.dayStreak} 天</span>`:''}</div>
+  <div>${goalText(b)}</div><div class="meter"><i style="width:${goalPct(b)}%"></i></div>${nt?`<div class="tag">累積 ${nt[0]} 顆星升級為「${nt[1]}」（目前 ${S.earned}）</div>`:''}</div><span class="go">去盲盒屋 →</span>`;
+ const cn=S.subj==='cn';$('subjMath').classList.toggle('on',!cn);$('subjCn').classList.toggle('on',cn);
+ $('heroH').textContent=cn?'看注音、寫國字、造句子！':'一關一關，練成直式高手！';
+ $('heroP').textContent=cn?'句子填空、看注音寫語詞、生字造詞、造句，一課一關。答對一樣拿星星、抽公仔盲盒！':'數字對齊、從個位算起、滿 10 進 1、不夠減就借 1。答對拿星星，星星可以抽「甜甜雲朵鎮」公仔盲盒，還有機會抽到隱藏版！';
+ if(cn){$('levels').innerHTML=renderCnLevels();document.querySelectorAll('[data-cn]').forEach(el=>el.onclick=()=>startCn(+el.dataset.cn));show('home');return}
+ $('levels').innerHTML=LEVELS.map((L,i)=>{const bs=S.best[L.id]||0,r=rating(bs),open=unlocked(i);
+  return `<button class="lv" type="button" data-i="${i}" ${open?'':'disabled'}>
+   <div class="lv-top"><span class="tag">第 ${i+1} 關${open?'':`・過「${LEVELS.find(x=>x.id===L.after).name}」解鎖`}</span><span class="lv-stars">${[1,2,3].map(k=>starSvg(k<=r)).join('')}</span></div>
+   <div class="lv-name">${L.name}</div><div class="lv-desc">${L.desc}</div>
+   <div class="lv-top"><span class="lv-ex">${L.ex}</span><span class="tag">${bs?'已過關':'第一次過關 +1 ★'}</span></div>
+   <div class="lv-top"><span class="mult m${String(L.mult).replace('.','')}">星星 ×${L.mult}</span><span class="tag">過關最多 ${reward(L,3)} ★</span></div></button>`}).join('');
+ document.querySelectorAll('.lv').forEach(el=>el.onclick=()=>startLevel(+el.dataset.i));
+ show('home');
+}
+$('bankCard').onclick=()=>openShop('shop');$('pillBtn').onclick=()=>openShop('shop');$('shopTop').onclick=()=>openShop('shop');
+$('unlockAll').onchange=e=>{S.unlockAll=e.target.checked;save();renderHome()};
+$('chal').onchange=e=>{S.challenge=e.target.checked;save();$('chal').closest('.chal').classList.toggle('on',S.challenge)};
+let resetArmed=false;
+$('resetBtn').onclick=()=>{if(!resetArmed){resetArmed=true;$('resetBtn').textContent='再按一次，確定清除星星和公仔';setTimeout(()=>{resetArmed=false;$('resetBtn').textContent='清除全部紀錄'},3000);return}
+ resetArmed=false;Object.assign(S,{best:{},earned:0,spent:0,v:2,owned:[],lv:{},pity:0,boxes:0,lastClearDay:'',dayStreak:0});save();$('resetBtn').textContent='清除全部紀錄';renderHome()};
+$('backBtn').onclick=renderHome;$('shopBack').onclick=renderHome;
+/* backup / restore: progress as a copyable code */
+const encodeSave=()=>'ZS1:'+btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+function decodeSave(txt){const t=String(txt||'').trim().replace(/\s+/g,'');if(!t.startsWith('ZS1:'))throw 0;
+ const o=JSON.parse(decodeURIComponent(escape(atob(t.slice(4)))));if(typeof o!=='object'||typeof o.earned!=='number'||!Array.isArray(o.owned))throw 0;return o}
+$('exportBtn').onclick=()=>{const code=encodeSave();
+ openModal(`<div class="tag">家長・備份紀錄</div><h3>這是孩子的進度碼</h3><p class="tag">星星 ${bal()} 顆・公仔 ${S.owned.length} 隻。把這段文字複製下來，傳給自己（LINE、Email、記事本都可以）。<br>到另一台電腦或 iPad 打開遊戲，按「還原紀錄」貼上就能接著玩。</p>
+  <textarea id="saveCode" class="code" readonly rows="5">${code}</textarea><div class="err" id="copyMsg" style="color:var(--good)"></div>
+  <div class="btns"><button class="big" type="button" id="copyCode">複製進度碼</button><button class="big alt" type="button" id="closeExp">關閉</button></div>`,()=>{
+  $('closeExp').onclick=closeModal;
+  $('copyCode').onclick=()=>{const ta=$('saveCode'),sel=()=>{ta.focus();ta.select();$('copyMsg').textContent='已選取，請按住文字選「拷貝」或按 Ctrl+C'};
+   try{navigator.clipboard.writeText(code).then(()=>{$('copyMsg').textContent='已複製！'},sel)}catch(e){sel()}}})};
+$('importBtn').onclick=()=>openModal(`<div class="tag">家長・還原紀錄</div><h3>貼上進度碼</h3><p class="tag">還原後，這台裝置目前的紀錄會被取代。</p>
+  <textarea id="loadCode" class="code" rows="5" placeholder="ZS1:……"></textarea><div class="err" id="loadErr"></div>
+  <div class="btns"><button class="big" type="button" id="doLoad">還原</button><button class="big alt" type="button" id="closeImp">取消</button></div>`,()=>{
+  $('closeImp').onclick=closeModal;let armed=null;
+  $('doLoad').onclick=()=>{let o;try{o=decodeSave($('loadCode').value)}catch(e){$('loadErr').textContent='進度碼不完整或不正確，請重新複製整段再貼上';return}
+   if(armed!==$('loadCode').value){armed=$('loadCode').value;$('loadErr').textContent=`這個進度碼有 ${o.earned-(o.spent||0)} 顆星、${o.owned.length} 隻公仔。再按一次「還原」確認。`;$('doLoad').textContent='確認還原';return}
+   Object.assign(S,{best:{},owned:[],lv:{},pity:0,boxes:0,spent:0,v:1},o);migrate(S);save();closeModal();renderHome();sfx('win')}});
+$('rulesBtn').onclick=()=>openModal(`<h3>星星怎麼拿？</h3><div class="bonus" style="margin-top:0">
+ ${[['過關評分','整關錯 0～1 次 ★★★・2～4 次 ★★・5 次以上 ★'],['過關獎勵（★★★／★★／★）','4／3／2 ★ × 難度倍數'],['難度倍數','前兩關 ×1・進位借位 ×1.5・百位不見了和三位數 ×2・大魔王 ×4'],['大魔王過關','16／12／8 ★'],['幸運題答對（每關 1 題）','+1 ★'],['第一次過某一關','+1 ★'],['開挑戰模式過關','+1 ★'],['今天第一次過關','+1 ★'],['連續練習 3 天','+2 ★'],['每連續練習 7 天','+4 ★']].map(r=>`<div class="brow"><span>${r[0]}</span><b>${r[1]}</b></div>`).join('')}</div>
+ <p class="tag" style="margin-top:12px">盲盒一共 30 個公仔（普通 12、稀有 9、傳說 5、隱藏版 4）。價格：第 1 抽 3 ★、第 2～6 抽 6 ★、第 7～15 抽 8 ★、第 16～30 抽 10 ★、之後 12 ★。<br>抽到重複的公仔會升級換裝（最高 Lv3），還沒有的公仔比較容易抽到，滿級的不會再出現。隱藏版機率從 8% 開始，每抽一次沒中就提高，第 10 次一定中。</p>
+ <div class="btns"><button class="big" type="button" id="okRules">知道了</button></div>`,()=>{$('okRules').onclick=closeModal});
+
+/* ---------- game ---------- */
+function startLevel(i){G={L:LEVELS[i],kind:'math',tag:`第 ${i+1} 關・${LEVELS[i].name}`,restart:()=>startLevel(i),next:i+1<LEVELS.length?()=>startLevel(i+1):null,li:i,q:0,base:[],mist:0,bonus:[],lucky:rnd(0,PER-1),luckyHit:false,ch:!!S.challenge};$('lvTitle').textContent=`第 ${i+1} 關・${LEVELS[i].name}${G.ch?'・挑戰模式':''}`;
+ $('hintBtn').hidden=G.ch;$('pad').querySelector('.zero').classList.toggle('wide',G.ch);show('play');nextProblem()}
+function makeP({op,a,b}){const res=op==='+'?a+b:a-b,A=digits(a),B=digits(b),R=digits(res),n=Math.max(A.length,B.length,R.length)+1,c=[0];
+ for(let p=0;p<n;p++)c[p+1]=op==='+'&&((A[p]||0)+(B[p]||0)+c[p])>=10?1:0;
+ return{op,a,b,res,A,B,R,n,c,w:A.slice(),entered:[],carry:{},fresh:new Set(),p:0,mistakes:0,colWrong:0,done:false}}
+function nextProblem(){
+ let q,tries=0;do{q=LEVELS[G.li].gen();tries++}while(G.last&&q.a===G.last.a&&q.b===G.last.b&&tries<20);G.last=q;
+ P=makeP(q);P.lucky=G.q===G.lucky;
+ $('board').classList.remove('solved');$('board').classList.toggle('lucky',P.lucky);$('luckyTag').hidden=!P.lucky;
+ $('pad').hidden=false;$('nextBtn').hidden=true;
+ renderDots();activate(0);render();
+ if(P.lucky&&(G.ch||!(P.op==='-'&&P.w[0]<(P.B[0]||0)))){say('幸運題出現了！這題答對，多拿 <b>1</b> 顆星！<br>從<b>個位</b>開始吧。','tip');sfx('magic')}
+}
+function renderDots(){$('dots').innerHTML=Array.from({length:PER},(_,i)=>{const s=G.base[i];return `<div class="dot ${s===3?'ok':s?'ok2':i===G.q?'now':''} ${i===G.lucky?'luck':''}">${s?'✓':i===G.lucky?'+1':i+1}</div>`}).join('')}
+function say(html,kind=''){const b=$('bubble');b.className='bubble '+kind;b.innerHTML=html}
+function activate(p,keep){P.p=p;P.colWrong=0;
+ if(P.op==='-'){const bv=P.B[p]||0;if(P.w[p]<bv){borrow(p,bv);return}}
+ if(!keep)say(p===0?`從<b>${PLACE[p]}</b>開始，由右往左算！`:`輪到<b>${PLACE[p]}</b>了！`);
+}
+function borrow(p,bv){let j=p+1;while(P.w[j]===0)j++;
+ const before=P.w[p],oldJ=P.w[j];P.w[j]-=1;P.fresh.add(j);
+ for(let k=p+1;k<j;k++){P.w[k]=9;P.fresh.add(k)}P.w[p]+=10;P.fresh.add(p);
+ if(G.ch){if(!(P.lucky&&p===0))say(p===0?`從<b>${PLACE[p]}</b>開始，由右往左算！`:`輪到<b>${PLACE[p]}</b>了！`);return}
+ sfx('swoop');
+ const pre=P.lucky&&p===0?'幸運題！答對多 +1 ★。<br>':'';
+ if(j===p+1)say(`${pre}${PLACE[p]} <b>${before}</b> 不夠減 <b>${bv}</b>，向${PLACE[j]}借 1！<br>${PLACE[j]} ${oldJ} 變成 <b>${oldJ-1}</b>，${PLACE[p]}變成 <b>${before+10}</b>。`,'tip');
+ else say(`${pre}${PLACE[p]} <b>${before}</b> 不夠減 <b>${bv}</b>，可是${PLACE[p+1]}是 0 借不到，要先跟${PLACE[j]}借！<br>${PLACE[j]} ${oldJ} 變成 <b>${oldJ-1}</b>，${PLACE[p+1]}變成 <b>9</b>，${PLACE[p]}變成 <b>${before+10}</b>。`,'tip');
+}
+function expr(p){if(P.op==='+'){const parts=[];if(p<P.A.length)parts.push(P.A[p]);if(p<P.B.length)parts.push(P.B[p]);if(P.c[p])parts.push('進位 1');const s=(P.A[p]||0)+(P.B[p]||0)+P.c[p];return{t:parts.join(' + '),s}}
+ return{t:`${P.w[p]} − ${P.B[p]||0}`,s:P.w[p]-(P.B[p]||0)}}
+function hint(p,reveal){const e=expr(p);
+ if(!reveal)return `${PLACE[p]}：<b>${e.t} = ?</b>`;
+ return `${PLACE[p]}：<b>${e.t} = ${e.s}</b>，${e.s>=10&&P.op==='+'?`寫 <b>${e.s%10}</b>，進 1`:`寫 <b>${e.s}</b>`}`}
+function press(d){if(!P||P.done)return;const p=P.p;
+ if(d===P.R[p]){P.entered[p]=d;P.fresh.add('a'+p);sfx('good');
+  let msg='';if(!G.ch&&P.op==='+'&&P.c[p+1]&&p+1<P.R.length){P.carry[p+1]=true;P.fresh.add(p+1);msg=`${expr(p).s} 滿 10 了！寫 <b>${d}</b>，把 <b>1</b> 進到${PLACE[p+1]}上面。`}
+  if(p+1<P.R.length){if(msg)say(msg,'tip');activate(p+1,!!msg);render()}else{render();finish()}
+ }else{P.mistakes++;P.colWrong++;sfx('bad');const b=$('board');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
+  if(G.ch){say(['再想想！','再想想，你可以的！','再算一次看看！'][P.colWrong%3],'bad');return}
+  say((P.colWrong>=2?'沒關係，我們一起算：<br>':'差一點點，再想想！<br>')+hint(p,P.colWrong>=2),'bad')}
+}
+const PRAISE=['太棒了！','完全正確！','你好厲害！','數學小高手！','漂亮！','一次就對，讚！'];
+function finish(){P.done=true;const st=P.mistakes===0?3:P.mistakes===1?2:1;
+ G.base.push(st);G.mist+=P.mistakes;let extra='';
+ if(P.lucky){G.bonus.push(['幸運題答對',1]);extra+='<br>幸運題答對，多拿 <b>1</b> 顆星！'}
+ if(P.op==='-'&&P.A.length>P.R.length)extra+=`<br>${PLACE[P.A.length-1]}借完變成 0，最前面的 0 不用寫，答案是${P.R.length===1?'一':'兩'}位數！`;
+ if(P.op==='+'&&P.R.length>Math.max(P.A.length,P.B.length))extra+=`<br>最後的進位 1 寫在${PLACE[P.R.length-1]}，答案變成${P.R.length===3?'三':'四'}位數！`;
+ $('board').classList.add('solved');render();renderDots();sfx('win');
+ const pr=P.mistakes===0?PRAISE[rnd(0,PRAISE.length-1)]:'算出來了，做得好！';
+ say(`${pr} 答案是 <b>${P.res}</b>。`+extra,'good');
+ const flyN=P.lucky?1:0;
+ for(let i=0;i<flyN;i++){const s=document.createElement('div');s.className='fly';s.style.setProperty('--dx',(i-(flyN-1)/2)*55+'px');s.style.animationDelay=i*.1+'s';s.innerHTML=starSvg();$('board').appendChild(s);setTimeout(()=>s.remove(),1600)}
+ $('pad').hidden=true;$('nextBtn').hidden=false;$('nextBtn').textContent=G.q+1<PER?'下一題 →':'看成績！';$('nextBtn').focus();
+}
+$('nextBtn').onclick=()=>{if(G.q+1<PER){G.q++;nextProblem()}else showDone()};
+function render(){const n=P.n,lenA=P.A.length,lenB=P.B.length,lenR=P.R.length,g=$('grid');g.style.setProperty('--n',n);let h='';
+ if(!P.done)h+=`<div class="hl" style="grid-column:${n-P.p}"></div>`;
+ for(let p=0;p<n-1;p++){const col=n-p,changed=!G.ch&&P.op==='-'&&p<lenA&&P.w[p]!==P.A[p];
+  const mk=G.ch?'':P.op==='+'?(P.carry[p]?'1':''):(changed?P.w[p]:'');
+  h+=`<div class="cell mark ${P.fresh.has(p)?'pop':''}" style="grid-column:${col};grid-row:1">${mk}</div>`;
+  h+=`<div class="cell num ${changed?'crossed':''}" style="grid-column:${col};grid-row:2">${p<lenA?P.A[p]:''}</div>`;
+  h+=`<div class="cell num" style="grid-column:${col};grid-row:3">${p<lenB?P.B[p]:''}</div>`;
+  if(p<lenR){const v=P.entered[p],cls=v!==undefined?'done':(p===P.p&&!P.done?'active':'');
+   h+=`<div class="cell ans ${cls} ${P.fresh.has('a'+p)?'pop':''}" style="grid-column:${col};grid-row:4">${v??''}</div>`}}
+ h+=`<div class="cell op" style="grid-column:1;grid-row:3">${P.op==='+'?'+':'−'}</div><div class="rule"></div>`;
+ g.innerHTML=h;P.fresh.clear();g.setAttribute('aria-label',`${P.a} ${P.op==='+'?'加':'減'} ${P.b}`);
+}
+$('pad').innerHTML=[1,2,3,4,5,6,7,8,9].map(d=>`<button class="key" type="button" data-d="${d}">${d}</button>`).join('')+
+ `<button class="key hint" type="button" id="hintBtn">提示</button><button class="key zero" type="button" data-d="0">0</button>`;
+$('pad').addEventListener('click',e=>{const k=e.target.closest('[data-d]');if(k)press(+k.dataset.d)});
+$('hintBtn').onclick=()=>{if(P&&!P.done)say('小提示：'+hint(P.p,false),'tip')};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden&&!gifting){closeModal();return}
+ if($('play').hidden||!P||!$('modal').hidden)return;
+ if(/^[0-9]$/.test(e.key)&&!P.done){press(+e.key);e.preventDefault()}
+ else if(e.key==='Enter'&&P.done&&document.activeElement!==$('nextBtn')){$('nextBtn').click()}});
+
+/* ---------- level complete ---------- */
+function showDone(){const L=G.L,r=rateOf(G.mist),old=S.best[L.id]||0,rec=r>old;
+ if(rec)S.best[L.id]=r;
+ const lines=[[`過關獎勵（${'★'.repeat(r)}${L.mult!==1?`・難度 ×${L.mult}`:''}）`,reward(L,r)],...G.bonus];
+ if(old===0)lines.push(['第一次過這一關',1]);
+ if(G.ch)lines.push(['挑戰模式過關（沒有提示）',1]);
+ const td=today();
+ if(S.lastClearDay!==td){lines.push(['今天第一次過關',1]);
+  S.dayStreak=S.lastClearDay===yesterday()?(S.dayStreak||0)+1:1;S.lastClearDay=td;
+  if(S.dayStreak===3)lines.push(['連續練習 3 天',2]);
+  if(S.dayStreak%7===0)lines.push([`連續練習 ${S.dayStreak} 天`,4]);}
+ const t=lines.reduce((s,l)=>s+l[1],0);
+ const add=lines.reduce((s,l)=>s+l[1],0),oldBal=bal(),oldTitle=titleOf(S.earned);
+ S.earned+=add;save();const newBal=bal(),newTitle=titleOf(S.earned);
+ const newly=old===0&&!S.unlockAll?LEVELS.filter(x=>x.after===L.id):[];
+ const msg=r===3?`超級厲害！整關只錯 ${G.mist} 次。`:r===2?`很棒！錯 ${G.mist} 次，再少一點就是三顆星。`:'完成了！多練幾次會越來越快。';
+ const price=boxPrice(),hasLeft=leftFigs().length>0,canBuy=hasLeft&&newBal>=price,newlyAfford=canBuy&&oldBal<price;
+ $('doneBox').innerHTML=`<div class="tag">${G.tag}</div><h2>${r===3?'全星通關！':'過關了！'}</h2>
+  <div class="badge-wrap"><div class="rays"></div>${r===3?'<svg class="crown" viewBox="0 0 84 56"><use href="#crown"/></svg>':''}
+   <div class="badge" id="badge"><div><span id="cnt">0</span><small>顆星存進存錢筒</small></div></div></div>
+  <div class="bigstars">${[1,2,3].map(k=>starSvg(k<=r)).join('')}</div>
+  <p>${msg}</p>
+  ${rec&&old>0?'<span class="note">新紀錄！</span>':''}${newly.map(x=>`<span class="note">解鎖：${x.name}</span>`).join('')}
+  <div class="bonus">${lines.map(l=>`<div class="brow hide"><span>${l[0]}</span><b>+${l[1]}</b></div>`).join('')}<div class="brow total hide"><span>這次一共得到</span><b>+${add} ★</b></div></div>
+  <div class="bankbox"><div class="tag">星星存錢筒</div>
+   <div class="bank-n"><span id="balN">${oldBal}</span> <svg class="star"><use href="#st"/></svg></div>
+   <div class="meter big"><i id="meterI" style="width:${goalPct(oldBal)}%"></i></div>
+   <div style="margin-top:6px">${goalText(newBal)}</div></div>
+  <div class="btns">${canBuy?`<button class="big ${newlyAfford?'green':''}" type="button" id="goShop">${newlyAfford?'可以抽盲盒了！去盲盒屋':'去盲盒屋抽公仔'}</button>`:''}
+  ${G.next?`<button class="big ${canBuy?'alt':''}" type="button" id="goNext">挑戰下一關 →</button>`:''}
+  <button class="big alt" type="button" id="again">再玩一次</button><button class="big alt" type="button" id="toHome">回到關卡</button></div>`;
+ show('done');sfx('fanfare');confetti();
+ if($('goShop'))$('goShop').onclick=()=>openShop('shop');
+ if($('goNext'))$('goNext').onclick=()=>G.next();
+ $('again').onclick=()=>G.restart();$('toHome').onclick=renderHome;
+ const rows=[...document.querySelectorAll('#doneBox .brow')];
+ const titleUp=()=>{if(newTitle!==oldTitle)setTimeout(()=>{sfx('fanfare');confetti();openModal(`<svg class="crown" viewBox="0 0 84 56"><use href="#crown"/></svg><div class="tag">稱號升級</div><h3>你現在是「${newTitle}」！</h3><p>累積了 ${S.earned} 顆星星，繼續加油！</p><div class="btns"><button class="big" type="button" id="okTitle">太棒了！</button></div>`,()=>{$('okTitle').onclick=closeModal})},500)};
+ const bank=()=>{$('meterI').style.width=goalPct(newBal)+'%';countTo($('balN'),oldBal,newBal,900,()=>{syncBal();titleUp()})};
+ const revealRows=()=>{if(reduced()){rows.forEach(r=>r.classList.remove('hide'));bank();return}
+  let i=0;(function nx(){if(!document.body.contains(rows[0]))return;const r=rows[i];r.classList.remove('hide');r.classList.add('show');sfx(i===rows.length-1?'win':'coin');
+   i++;if(i<rows.length)setTimeout(nx,380);else setTimeout(bank,400)})()};
+ if(reduced()){$('cnt').textContent=t;revealRows();return}
+ let i=0;const step=()=>{if(!$('cnt'))return;i++;$('cnt').textContent=i;const b=$('badge');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump');sfx('tick',i);
+  if(i<t)setTimeout(step,80);else setTimeout(revealRows,350)};
+ setTimeout(step,600);
+}
+function countTo(el,from,to,ms,cb){if(reduced()){el.textContent=to;cb&&cb();return}const t0=performance.now();
+ (function f(now){const k=Math.min(1,(now-t0)/ms);el.textContent=Math.round(from+(to-from)*k);if(k<1)requestAnimationFrame(f);else cb&&cb()})(t0)}
+
+/* ---------- 國語：寫寫看 ---------- */
+/* 字庫：翰林國語二上。生字與認讀字取自課本；填空句、造句範例由 Claude 自行撰寫，不是課文。
+   write：習寫字（要會寫）  read：認讀字（只要會認，出「選讀音」題）
+   words：w 答案、alt 也算對、ex 題目句（＿＿ 是空格）
+   chars：c 生字、eg 造詞範例      sents：w 要用的語詞、min 最少字數、ex 範例句 */
+const CN_BANK=[
+ {id:'L1',title:'第一課 我的心情',write:'候颳冷躲閃電難烏雲密布盆充滿放晴現虹',
+  read:[{c:'傾',w:'傾盆大雨',zy:'ㄑㄧㄥ'},{c:'麗',w:'美麗',zy:'ㄌㄧˋ'}],
+  words:[{w:'時候',ex:'下雨的＿＿，我會撐傘出門。'},{w:'冷風',ex:'冬天的早上，吹來一陣＿＿。'},{w:'閃電',ex:'天空突然出現一道＿＿，好亮！'},
+   {w:'難過',alt:['傷心'],ex:'下雨不能去公園，我覺得好＿＿。'},{w:'烏雲',ex:'天上飄來一大片＿＿，快要下雨了。'},{w:'充滿',ex:'生日那天，我的心裡＿＿了快樂。'},
+   {w:'放晴',ex:'雨停了，天空慢慢＿＿了。'},{w:'出現',ex:'雨停以後，天上＿＿一道彩虹。'},{w:'彩虹',ex:'雨過天晴，天空掛著一道七彩的＿＿。'},{w:'躲',ex:'玩捉迷藏時，弟弟＿＿在門後面。'}],
+  chars:[{c:'冷',eg:['冷風','冰冷','冷水','好冷']},{c:'雲',eg:['白雲','烏雲','雲朵']},{c:'電',eg:['電話','電視','閃電','電燈']},{c:'滿',eg:['充滿','滿天','裝滿','滿意']},
+   {c:'晴',eg:['晴天','放晴']},{c:'現',eg:['現在','出現','發現']},{c:'放',eg:['放學','放心','放晴','放手']},{c:'難',eg:['難過','很難','難題']}],
+  sents:[{w:'一會兒',min:8,ex:'弟弟一會兒唱歌，一會兒跳舞，好開心。'},{w:'時候',min:6,ex:'放學的時候，我和同學一起走回家。'}]},
+ {id:'L2',title:'第二課 彩色的天空',write:'老師新希望卻始緊因為知道怎消失習最掛',
+  read:[{c:'轉',w:'轉學生',zy:'ㄓㄨㄢˇ'},{c:'熟',w:'不熟',zy:'ㄕㄡˊ'},{c:'辦',w:'怎麼辦',zy:'ㄅㄢˋ'},{c:'舞',w:'跳舞',zy:'ㄨˇ'}],
+  words:[{w:'老師',ex:'上課時，＿＿請我們打開課本。'},{w:'希望',ex:'我＿＿明天是好天氣。'},{w:'開始',ex:'鐘聲響了，上課＿＿了。'},{w:'緊張',ex:'第一次上臺說話，我好＿＿。'},
+   {w:'因為',ex:'＿＿下大雨，我們不能去公園。'},{w:'知道',ex:'你＿＿今天星期幾嗎？'},{w:'消失',ex:'太陽出來，地上的水慢慢＿＿了。'},{w:'學習',ex:'我們要一起快樂的＿＿。'},
+   {w:'最後',ex:'跑步比賽，弟弟跑在＿＿面。'},{w:'掛在',ex:'媽媽把我的畫＿＿牆上。'}],
+  chars:[{c:'老',eg:['老師','老人','很老']},{c:'新',eg:['新年','新衣','新的']},{c:'望',eg:['希望','看望']},{c:'始',eg:['開始']},
+   {c:'緊',eg:['緊張','很緊','要緊']},{c:'知',eg:['知道','不知']},{c:'習',eg:['學習','練習','習作']},{c:'掛',eg:['掛上','掛著','掛在']}],
+  sents:[{w:'卻',min:8,ex:'我想了很久，卻想不出答案。'},{w:'緊張',min:6,ex:'考試前，我覺得有一點緊張。'}]},
+ {id:'L3',title:'第三課 國王做新衣',write:'國王喜歡穿只件點改領越設計發方法分享',
+  read:[{c:'臣',w:'大臣',zy:'ㄔㄣˊ'},{c:'袖',w:'袖子',zy:'ㄒㄧㄡˋ'},{c:'驚',w:'驚喜',zy:'ㄐㄧㄥ'},{c:'讓',w:'讓我',zy:'ㄖㄤˋ'}],
+  words:[{w:'國王',ex:'從前有一位＿＿，很愛穿新衣。'},{w:'喜歡',ex:'我最＿＿吃西瓜。'},{w:'穿上',ex:'天氣冷了，記得＿＿外套。'},{w:'一件',ex:'媽媽買了＿＿新衣服給我。'},
+   {w:'一點',ex:'湯有＿＿燙，要慢慢喝。'},{w:'改正',alt:['改好'],ex:'寫錯的字要趕快＿＿。'},{w:'衣領',ex:'他把＿＿拉好，看起來好整齊。'},{w:'設計',ex:'姐姐自己＿＿了一張生日卡片。'},
+   {w:'方法',alt:['辦法'],ex:'老師教我們記生字的好＿＿。'},{w:'分享',ex:'我把餅乾＿＿給同學吃。'}],
+  chars:[{c:'國',eg:['國王','國家','國語']},{c:'喜',eg:['喜歡','喜愛','歡喜']},{c:'穿',eg:['穿衣','穿上','穿鞋']},{c:'點',eg:['一點','點心','點頭','點名']},
+   {c:'改',eg:['改正','改變','改好']},{c:'發',eg:['發現','發光','出發']},{c:'方',eg:['方法','地方','方向','方形']},{c:'分',eg:['分享','分開','十分']}],
+  sents:[{w:'越',min:8,ex:'風越吹越大，樹葉都掉下來了。'},{w:'只要',min:8,ex:'只要天氣好，我們就去公園玩。'}]},
+ {id:'L4',title:'第四課 水草下的呱呱',write:'呱聞聲猜蛙別靠近抓如果乖腦袋瓜證明頂',
+  read:[{c:'影',w:'影子',zy:'ㄧㄥˇ'},{c:'蝦',w:'蝦蟆',zy:'ㄏㄚˊ'},{c:'蟆',w:'蝦蟆',zy:'ㄇㄚˊ'},{c:'擔',w:'擔心',zy:'ㄉㄢ'}],
+  words:[{w:'聲音',ex:'我聽到門外有說話的＿＿。'},{w:'青蛙',ex:'池塘邊有一隻綠色的＿＿。'},{w:'靠近',ex:'請不要＿＿火爐。'},{w:'如果',ex:'＿＿明天下雨，我們就在家看書。'},
+   {w:'乖乖',ex:'小狗＿＿的坐在門口等我。'},{w:'腦袋',ex:'他抓抓＿＿，想不出答案。'},{w:'證明',ex:'我騎給你看，＿＿我會騎腳踏車。'},{w:'頭頂',ex:'小鳥飛過我的＿＿。'},
+   {w:'西瓜',alt:['木瓜'],ex:'夏天吃冰涼的＿＿，好舒服。'},{w:'別人',ex:'不可以拿＿＿的東西。'}],
+  chars:[{c:'聲',eg:['聲音','大聲','小聲','歌聲']},{c:'猜',eg:['猜猜','猜謎']},{c:'近',eg:['靠近','很近','附近']},{c:'抓',eg:['抓住','抓到','抓頭']},
+   {c:'果',eg:['水果','如果','果汁']},{c:'明',eg:['明天','明白','明亮']},{c:'頂',eg:['頭頂','山頂','屋頂']},{c:'別',eg:['別人','分別','特別']}],
+  sents:[{w:'不只',min:8,ex:'哥哥不只會畫畫，還會彈琴。'},{w:'還是',min:6,ex:'你想喝牛奶還是果汁？'}]},
+ {id:'L5',title:'第五課 沙灘上的畫',write:'沙灘海邊退遠螃蟹愛注夕腳丫橫留印挖麗',read:[],
+  words:[{w:'沙灘',ex:'我們在＿＿上堆城堡。'},{w:'海邊',ex:'暑假我們全家去＿＿玩水。'},{w:'很遠',ex:'學校離我家＿＿，要坐公車。'},{w:'螃蟹',ex:'＿＿橫著走路，好有趣。'},
+   {w:'可愛',ex:'小貓咪長得好＿＿。'},{w:'注意',alt:['小心'],ex:'過馬路要＿＿車子。'},{w:'夕陽',ex:'傍晚的＿＿，把天空照得紅紅的。'},{w:'腳印',ex:'沙灘上留下我們的＿＿。'},
+   {w:'美麗',alt:['漂亮'],ex:'花園裡的花好＿＿。'},{w:'挖洞',ex:'小狗在土裡＿＿。'}],
+  chars:[{c:'沙',eg:['沙灘','沙子','沙發']},{c:'海',eg:['海邊','大海','海水']},{c:'邊',eg:['海邊','旁邊','這邊','左邊']},{c:'遠',eg:['很遠','遠方']},
+   {c:'愛',eg:['可愛','愛心']},{c:'腳',eg:['腳印','腳步','手腳']},{c:'留',eg:['留下','留言']},{c:'印',eg:['腳印','印出','手印']}],
+  sents:[{w:'好像',min:8,ex:'天上的白雲，好像一團團棉花糖。'},{w:'注意',min:6,ex:'過馬路時，要注意左右的車子。'}]},
+ {id:'L6',title:'第六課 草叢裡的星星',write:'月奶晚飯散屋竹林頭溪旁暗眼睛那聚成顆',
+  read:[{c:'叢',w:'草叢',zy:'ㄘㄨㄥˊ'},{c:'盡',w:'盡頭',zy:'ㄐㄧㄣˋ'}],
+  words:[{w:'晚飯',alt:['晚餐'],ex:'爸爸煮了好吃的＿＿。'},{w:'散步',ex:'吃完飯，我們去公園＿＿。'},{w:'竹林',alt:['樹林'],ex:'屋後有一片綠綠的＿＿。'},{w:'小溪',ex:'清清的＿＿裡有小魚在游。'},
+   {w:'旁邊',ex:'我坐在媽媽的＿＿。'},{w:'眼睛',ex:'小貓的＿＿又大又圓。'},{w:'很暗',alt:['好暗'],ex:'太陽下山了，天色＿＿。'},{w:'一顆',ex:'天上有＿＿亮亮的星星。'},
+   {w:'月亮',ex:'中秋節的＿＿又大又圓。'},{w:'奶奶',alt:['爺爺'],ex:'＿＿每天早上都去公園做體操。'}],
+  chars:[{c:'月',eg:['月亮','一月','月光']},{c:'晚',eg:['晚上','晚飯','很晚']},{c:'飯',eg:['吃飯','晚飯','飯盒']},{c:'頭',eg:['點頭','頭頂','石頭']},
+   {c:'林',eg:['竹林','樹林','森林']},{c:'眼',eg:['眼睛','眼淚']},{c:'成',eg:['完成','變成','成為']},{c:'顆',eg:['一顆','顆粒']}],
+  sents:[{w:'一下子',min:8,ex:'小狗一下子跑到東邊，一下子跑到西邊。'},{w:'真是',min:6,ex:'滿天的星星，真是美麗。'}]},
+ {id:'L7',title:'第七課 不一樣的美食',write:'樣香清食味節郊便保活奇筒當平盒安客南',
+  read:[{c:'祖',w:'祖先',zy:'ㄗㄨˇ'},{c:'艾',w:'艾粄',zy:'ㄞˋ'},{c:'粄',w:'艾粄',zy:'ㄅㄢˇ'},{c:'捲',w:'春捲',zy:'ㄐㄩㄢˇ'}],
+  words:[{w:'香味',alt:['香氣'],ex:'廚房飄出蛋糕的＿＿。'},{w:'郊外',ex:'假日我們到＿＿踏青。'},{w:'便當',ex:'媽媽幫我準備了好吃的＿＿。'},{w:'平安',ex:'祝你一路＿＿。'},
+   {w:'活動',ex:'學校舉辦了好玩的＿＿。'},{w:'好奇',ex:'弟弟很＿＿盒子裡裝了什麼。'},{w:'客人',ex:'家裡來了好多＿＿。'},{w:'一樣',ex:'我們兩個人的鉛筆盒＿＿。'},
+   {w:'美食',ex:'夜市裡有好多＿＿。'},{w:'清明節',ex:'＿＿到了，我們一家人回鄉下。'}],
+  chars:[{c:'樣',eg:['一樣','樣子','怎樣']},{c:'香',eg:['香味','香蕉','好香']},{c:'清',eg:['清水','清楚','清明節']},{c:'味',eg:['味道','香味','美味']},
+   {c:'節',eg:['節日','過節']},{c:'保',eg:['保護','保平安']},{c:'活',eg:['活動','生活']},{c:'安',eg:['平安','安全','安靜']}],
+  sents:[{w:'還有',min:8,ex:'我的書包裡有課本，有鉛筆，還有一個便當。'},{w:'不但',min:8,ex:'媽媽煮的湯不但好喝，還很香。'}]},
+ {id:'L8',title:'第八課 美食分享日',write:'介圓形白紙米變軟搶材蝦線各種菜接聽更',
+  read:[{c:'紹',w:'介紹',zy:'ㄕㄠˋ'},{c:'舉',w:'舉手',zy:'ㄐㄩˇ'}],
+  words:[{w:'圓形',ex:'這個盤子是＿＿的。'},{w:'白紙',ex:'我在＿＿上畫了一棵樹。'},{w:'米飯',ex:'熱熱的＿＿好香。'},{w:'變軟',ex:'餅乾泡在牛奶裡會＿＿。'},
+   {w:'搶著',ex:'大家＿＿回答問題。'},{w:'食材',ex:'媽媽到市場買煮飯的＿＿。'},{w:'蝦子',ex:'海裡有很多魚和＿＿。'},{w:'各種',ex:'花園裡有＿＿顏色的花。'},
+   {w:'青菜',alt:['蔬菜'],ex:'多吃＿＿，身體才會好。'},{w:'聽到',alt:['聽見'],ex:'我＿＿小鳥在唱歌。'}],
+  chars:[{c:'白',eg:['白色','白雲','白紙','明白']},{c:'紙',eg:['白紙','紙條','紙船']},{c:'米',eg:['米飯','白米','米粒']},{c:'變',eg:['變成','變軟','改變']},
+   {c:'線',eg:['毛線','線條','米線']},{c:'種',eg:['各種','種子','種花']},{c:'菜',eg:['青菜','白菜','菜園']},{c:'接',eg:['接著','接住']}],
+  sents:[{w:'有了',min:8,ex:'有了好朋友，遊戲更好玩。'},{w:'馬上',min:6,ex:'聽到鐘聲，大家馬上回到教室。'}]},
+ {id:'L9',title:'第九課 好味道',write:'黃粒苔沖熱蛋澡浴蔬蘿蒸通蔔胖細哪名淡',
+  read:[{c:'黏',w:'黏在一起',zy:'ㄋㄧㄢˊ'},{c:'飄',w:'飄出來',zy:'ㄆㄧㄠ'}],
+  words:[{w:'黃色',ex:'香蕉是＿＿的。'},{w:'米粒',ex:'碗裡還有幾顆＿＿。'},{w:'洗澡',alt:['沖澡'],ex:'睡覺前要先＿＿。'},{w:'雞蛋',ex:'早餐我吃了一顆＿＿。'},
+   {w:'紅蘿蔔',alt:['蘿蔔'],ex:'小兔子最愛吃＿＿。'},{w:'蒸熟',ex:'包子＿＿了，好香喔。'},{w:'胖胖',ex:'小豬長得＿＿的。'},{w:'細心',alt:['小心'],ex:'妹妹很＿＿的把書包整理好。'},
+   {w:'名字',ex:'請在作業本上寫上你的＿＿。'},{w:'淡淡',ex:'花園裡飄來＿＿的花香。'}],
+  chars:[{c:'黃',eg:['黃色','黃瓜']},{c:'熱',eg:['熱水','熱鬧','好熱']},{c:'蛋',eg:['雞蛋','蛋糕','蛋皮']},{c:'通',eg:['通通','交通','通過']},
+   {c:'細',eg:['細心','細細','仔細']},{c:'名',eg:['名字','點名','有名']},{c:'淡',eg:['淡淡','清淡']},{c:'胖',eg:['胖胖','胖子']}],
+  sents:[{w:'淡淡的',min:8,ex:'窗外吹來淡淡的花香。'},{w:'通通',min:6,ex:'把玩具通通收進箱子裡。'}]},
+ {id:'L10',title:'第十課 加加減減',write:'題答減趕搖表突百讀異嘴認口哥識對數謎',
+  read:[{c:'嘟',w:'嘟著嘴',zy:'ㄉㄨ'}],
+  words:[{w:'題目',alt:['問題'],ex:'這個＿＿好難喔。'},{w:'回答',ex:'請舉手＿＿問題。'},{w:'趕快',alt:['趕緊'],ex:'要遲到了，我們＿＿走吧！'},{w:'搖頭',ex:'弟弟不想吃青菜，一直＿＿。'},
+   {w:'表哥',alt:['表姐','表弟','表妹'],ex:'＿＿比我大三歲。'},{w:'突然',ex:'天空＿＿下起大雨。'},{w:'讀書',alt:['看書'],ex:'哥哥在房間裡＿＿。'},{w:'認識',ex:'我在新學校＿＿了新朋友。'},
+   {w:'答對',ex:'我＿＿了老師的問題。'},{w:'數學',ex:'我最喜歡上＿＿課。'}],
+  chars:[{c:'題',eg:['題目','問題','難題']},{c:'答',eg:['回答','答對','答案']},{c:'讀',eg:['讀書','朗讀']},{c:'認',eg:['認識','認真','認得']},
+   {c:'口',eg:['口水','門口','一口']},{c:'對',eg:['答對','對面','不對']},{c:'數',eg:['數學','數字','分數']},{c:'百',eg:['一百','百分']}],
+  sents:[{w:'可是',min:8,ex:'我想出去玩，可是外面在下雨。'},{w:'一起',min:6,ex:'下課了，我們一起去打球。'}]},
+ {id:'L11',title:'第十一課 奇怪的門',write:'怪門扇立刻閒馬闖耳主播報力竟巴東西底',
+  read:[{c:'慌',w:'發慌',zy:'ㄏㄨㄤ'},{c:'仔',w:'仔細',zy:'ㄗˇ'},{c:'擠',w:'擠來擠去',zy:'ㄐㄧˇ'},{c:'妖',w:'妖怪',zy:'ㄧㄠ'}],
+  words:[{w:'奇怪',ex:'真＿＿，我的鉛筆不見了。'},{w:'大門',ex:'學校的＿＿打開了。'},{w:'立刻',alt:['馬上'],ex:'聽到媽媽叫我，我＿＿跑過去。'},{w:'一扇',ex:'教室有＿＿大窗戶。'},
+   {w:'小馬',ex:'草原上有一匹＿＿在吃草。'},{w:'耳朵',ex:'兔子的＿＿長長的。'},{w:'主人',ex:'小狗看到＿＿回家，好開心。'},{w:'用力',ex:'他＿＿推開大門。'},
+   {w:'東西',ex:'自己的＿＿要自己收好。'},{w:'尾巴',ex:'小狗開心的搖著＿＿。'}],
+  chars:[{c:'怪',eg:['奇怪','怪人']},{c:'門',eg:['大門','門口','開門']},{c:'立',eg:['立刻','站立','立正']},{c:'馬',eg:['小馬','馬上','馬路']},
+   {c:'耳',eg:['耳朵','木耳']},{c:'主',eg:['主人','主角']},{c:'力',eg:['用力','力氣','努力']},{c:'東',eg:['東西','東邊']}],
+  sents:[{w:'竟然',min:8,ex:'我打開盒子，裡面竟然是一隻小青蛙！'},{w:'立刻',min:6,ex:'鐘聲一響，大家立刻排好隊。'}]},
+ {id:'L12',title:'第十二課 詠鵝',write:'念曲項浮掌撥波詩作首指伸脖身體隻倒肚',
+  read:[{c:'詠',w:'詠鵝',zy:'ㄩㄥˇ'},{c:'鵝',w:'白鵝',zy:'ㄜˊ'},{c:'歲',w:'七歲',zy:'ㄙㄨㄟˋ'},{c:'翻',w:'翻跟頭',zy:'ㄈㄢ'}],
+  words:[{w:'一首詩',ex:'我會背＿＿。'},{w:'脖子',ex:'長頸鹿的＿＿好長。'},{w:'身體',ex:'多運動，＿＿才會好。'},{w:'一隻',ex:'池塘裡有＿＿白鵝。'},
+   {w:'倒立',ex:'哥哥會用手＿＿。'},{w:'肚子',alt:['肚皮'],ex:'吃太飽了，＿＿好撐。'},{w:'伸長',ex:'小狗＿＿脖子看窗外。'},{w:'手指',ex:'我用＿＿數數。'},
+   {w:'腳掌',ex:'小鴨的＿＿可以划水。'},{w:'作業',ex:'寫完＿＿才可以去玩。'}],
+  chars:[{c:'詩',eg:['詩人','念詩','童詩']},{c:'作',eg:['作業','工作','作詩']},{c:'首',eg:['一首','首先']},{c:'指',eg:['手指','指著','指頭']},
+   {c:'伸',eg:['伸長','伸手','伸出']},{c:'身',eg:['身體','轉身','身上']},{c:'體',eg:['身體','體操','體育']},{c:'倒',eg:['倒立','倒水','跌倒']}],
+  sents:[{w:'接著',min:8,ex:'我先刷牙，接著洗臉。'},{w:'伸長',min:6,ex:'長頸鹿伸長脖子吃樹葉。'}]}
+];
+const CN_N=6;
+const CN_LV=()=>{const ls=CN_BANK.map(b=>({id:'cn:'+b.id,mult:1.5,name:b.title,lessons:[b],bank:b}));
+ ls.push({id:'cn:boss',mult:3,name:'國語大魔王',lessons:CN_BANK,boss:true});return ls};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]]}return a};
+/* 選讀音的錯誤選項：換聲調、換相近的聲母或韻母 */
+const ZY_SIM=[['ㄓ','ㄗ'],['ㄔ','ㄘ'],['ㄕ','ㄙ'],['ㄋ','ㄌ'],['ㄈ','ㄏ'],['ㄅ','ㄆ'],['ㄉ','ㄊ'],['ㄍ','ㄎ'],['ㄐ','ㄑ'],['ㄢ','ㄤ'],['ㄣ','ㄥ'],['ㄛ','ㄡ'],['ㄟ','ㄞ']];
+function zyWrong(r){const base=r.replace(/[ˊˇˋ˙]/g,''),tones=['','ˊ','ˇ','ˋ'],cur=(r.match(/[ˊˇˋ]/)||[''])[0],out=new Set();
+ for(const t of shuffle(tones))if(t!==cur&&out.size<2)out.add(base+t);
+ for(const [a,b] of shuffle(ZY_SIM)){if(out.size>=4)break;if(base.includes(a))out.add(base.replace(a,b)+cur);else if(base.includes(b))out.add(base.replace(b,a)+cur)}
+ for(const t of tones){if(out.size>=4)break;const x=base.replace(/ㄧ|ㄨ/,'')+t;if(x&&x!==r)out.add(x)}
+ out.delete(r);return shuffle([...out]).slice(0,3)}
+function cnMake(lessons){const pick=arr=>arr&&arr.length?arr[rnd(0,arr.length-1)]:null;
+ const mk={fill:b=>{const w=pick(b.words);return w&&{t:'fill',ans:[w.w],zy:zyWord(w.w),text:w.ex}},
+  blank:b=>{const w=pick(b.words);return w&&{t:'blank',ans:[w.w,...(w.alt||[])],zy:zyWord(w.w),text:w.ex}},
+  zy:b=>{const w=pick(b.words);return w&&{t:'zy',ans:[w.w],zy:zyWord(w.w)}},
+  read:b=>{const r=pick(b.read);return r&&{t:'read',c:r.c,w:r.w,ans:[r.zy],opts:shuffle([r.zy,...zyWrong(r.zy)])}},
+  word:b=>{const c=pick(b.chars);return c&&{t:'word',char:c.c,eg:c.eg||[]}},
+  sent:b=>{const x=pick(b.sents);return x&&{t:'sent',w:x.w,min:x.min||6,eg:[x.ex]}}};
+ const order=['fill','blank','zy','read','word','sent'],out=[],seen=new Set();
+ for(const t of order){let q=null;for(let k=0;k<14&&!q;k++){const b=pick(lessons);const c=mk[t](b)||(k>8?mk.fill(b):null);if(!c)continue;
+   const key=(c.t==='sent'||c.t==='word'||c.t==='read'?c.t:'')+(c.c||c.char||c.w||c.ans[0]);if(!seen.has(key)||k>=12){seen.add(key);q=c}}
+  if(q)out.push(q)}
+ while(out.length<CN_N)out.push(mk.fill(pick(lessons)));return out}
+const cnNorm=s=>String(s||'').replace(/[\s　]/g,'').replace(/[.。,，!！?？、;；:：「」『』（）()~～…]/g,'');
+const isHan=s=>/^[㐀-鿿豈-﫿]+$/.test(s);
+function cnCheck(q,raw){const v=cnNorm(raw);if(!v)return{ok:false,msg:'還沒有寫答案喔！'};
+ if(q.t==='fill'||q.t==='zy'||q.t==='blank')return q.ans.some(a=>cnNorm(a)===v)?{ok:true}:{ok:false,msg:'再想想！'};
+ if(q.t==='word'){if(!isHan(v))return{ok:false,msg:'只要寫國字就好喔！'};if(!v.includes(q.char))return{ok:false,msg:`語詞裡要有「${q.char}」這個字喔！`};
+  if(v.length<2)return{ok:false,msg:`「${q.char}」再加一個字，變成語詞！`};if(v.length>4)return{ok:false,msg:'語詞寫 2 到 4 個字就好！'};return{ok:true}}
+ if(q.t==='sent'){const han=(v.match(/[㐀-鿿豈-﫿]/g)||[]).length;
+  if(!v.includes(q.w))return{ok:false,msg:`句子裡要用到「${q.w}」喔！`};if(han<q.min)return{ok:false,msg:`句子再長一點，至少要 ${q.min} 個字（現在 ${han} 個）。`};
+  if(v===q.w)return{ok:false,msg:'把語詞放進一句完整的話裡！'};return{ok:true}}
+ return{ok:false,msg:'再想想！'}}
+
+let C=null,CQ=null;
+function startCn(i){const all=CN_LV(),L=all[i];
+ G={li:i,L,kind:'cn',tag:`國語・${L.name}`,q:0,base:[],mist:0,bonus:[],lucky:rnd(0,CN_N-1),ch:!!S.challenge,
+  restart:()=>startCn(i),next:i+1<all.length?()=>startCn(i+1):null};
+ C={qs:cnMake(L.lessons)};
+ $('cnTitle').textContent=`國語・${L.name}${G.ch?'・挑戰模式':''}`;
+ show('cnplay');cnNext()}
+function cnDots(){$('cnDots').innerHTML=Array.from({length:CN_N},(_,i)=>{const s=G.base[i];return `<div class="dot ${s===3?'ok':s?'ok2':i===G.q?'now':''} ${i===G.lucky?'luck':''}">${s?'✓':i===G.lucky?'+1':i+1}</div>`}).join('')}
+const CN_TYPE={fill:'句子填空・看注音',blank:'句子填空・自己想',zy:'看注音，寫語詞',read:'認讀字・選讀音',word:'生字造詞',sent:'造句'};
+function cnNext(){CQ=Object.assign({mistakes:0,done:false},C.qs[G.q]);CQ.lucky=G.q===G.lucky;const isRead=CQ.t==='read';
+ $('cnBoard').classList.remove('solved','shake');$('cnBoard').classList.toggle('lucky',CQ.lucky);$('cnLucky').hidden=!CQ.lucky;
+ $('qType').textContent=CN_TYPE[CQ.t];const inp=$('cnInput');inp.value='';inp.disabled=false;inp.rows=CQ.t==='sent'?3:1;inp.hidden=isRead;
+ inp.placeholder=CQ.t==='sent'?'在這裡寫一句話':'在這裡寫答案';
+ let h='';
+ if(CQ.t==='fill')h=CQ.text.replace('＿＿',`<span class="blank">（<span class="zy">${CQ.zy}</span>）</span>`);
+ if(CQ.t==='blank')h=CQ.text.replace('＿＿','<span class="blank">（　　）</span>');
+ if(CQ.t==='zy')h=`<span class="zybig">${CQ.zy}</span>`;
+ if(CQ.t==='read')h=`「<span class="noz tgt">${CQ.w.replace(CQ.c,`<u>${CQ.c}</u>`)}</span>」的「<span class="noz tgt"><u>${CQ.c}</u></span>」怎麼念？`;
+ if(CQ.t==='word')h=`用「<span class="hanbig">${CQ.char}</span>」寫一個語詞`;
+ if(CQ.t==='sent')h=`用「<b>${CQ.w}</b>」寫一個句子<div class="tag">至少 ${CQ.min} 個字</div>`;
+ $('qText').innerHTML=h;
+ if(isRead){$('qSlots').innerHTML=`<div class="opts">${CQ.opts.map((o,i)=>`<button class="opt" type="button" data-o="${i}">${o}</button>`).join('')}</div>`;
+  $('qSlots').querySelectorAll('.opt').forEach(b=>b.onclick=()=>cnPick(b))}else cnSlots();
+ const intro={fill:'看注音，想一想括號裡要寫什麼字。',blank:'沒有注音喔！讀讀看句子，想一想括號裡可以填什麼語詞。',zy:'把注音寫成國字。',read:'這是認讀字，只要會念就好。點一點正確的注音。',word:`「${CQ.char}」可以組成哪些語詞呢？`,sent:'想一想什麼時候會用到這個語詞，寫成一句話。'}[CQ.t];
+ cnSay((CQ.lucky?'幸運題！答對多拿 <b>1</b> 顆星。<br>':'')+intro,CQ.lucky?'tip':'');if(CQ.lucky)sfx('magic');
+ $('cnOk').hidden=isRead;$('cnHint').hidden=G.ch||isRead;$('cnNextBtn').hidden=true;cnDots();
+ if(!isRead)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
+function cnPick(btn){if(!CQ||CQ.done)return;const o=CQ.opts[+btn.dataset.o];
+ if(o===CQ.ans[0]){btn.classList.add('right');cnFinish(false);return}
+ btn.classList.add('wrong');btn.disabled=true;CQ.mistakes++;sfx('bad');
+ if(CQ.mistakes>=2){$('qSlots').querySelectorAll('.opt').forEach(b=>{if(CQ.opts[+b.dataset.o]===CQ.ans[0])b.classList.add('right')});cnFinish(true);return}
+ cnSay(G.ch?'再想想！':'再想想！念念看整個語詞。','bad')}
+function cnSlots(){const v=cnNorm($('cnInput').value);let n=CQ.t==='fill'||CQ.t==='zy'||CQ.t==='blank'?CQ.ans[0].length:CQ.t==='word'?Math.max(2,v.length):0;
+ if(!n){$('qSlots').innerHTML='';return}
+ $('qSlots').innerHTML=Array.from({length:n},(_,i)=>`<span class="slot-box ${v[i]?'on':''}">${v[i]||''}</span>`).join('')}
+function cnSay(h,k=''){const b=$('cnBubble');b.className='bubble '+k;b.innerHTML=h}
+function cnSubmit(){if(!CQ||CQ.done||CQ.t==='read')return;const r=cnCheck(CQ,$('cnInput').value);
+ if(!cnNorm($('cnInput').value)){cnSay(r.msg,'tip');return}
+ if(r.ok){cnFinish(false);return}
+ CQ.mistakes++;sfx('bad');const b=$('cnBoard');b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
+ if(CQ.mistakes>=3){cnFinish(true);return}
+ if(G.ch||CQ.t==='word'||CQ.t==='sent'){cnSay(r.msg,'bad');return}
+ if(CQ.t==='blank')cnSay(CQ.mistakes===1?'再想想！讀一次整個句子。':`再想想！注音是「<b>${CQ.zy}</b>」。`,'bad');
+ else cnSay(CQ.mistakes===1?'再想想！可以按「提示」看看。':`再想想！第一個字是「<b>${CQ.ans[0][0]}</b>」。`,'bad')}
+function cnHint(){if(!CQ||CQ.done)return;
+ const h={blank:`注音是「<b>${CQ.zy}</b>」。`,fill:`第一個字是「<b>${CQ.ans&&CQ.ans[0][0]}</b>」，一共 ${CQ.ans&&CQ.ans[0].length} 個字。`,zy:`第一個字是「<b>${CQ.ans&&CQ.ans[0][0]}</b>」。`,
+  word:`可以在「${CQ.char}」的前面或後面加一個字，例如「${(CQ.eg||[])[0]||''}」。`,sent:`可以想想：誰？在哪裡？做什麼？例如：${(CQ.eg||[])[0]||''}`}[CQ.t];cnSay('小提示：'+h,'tip')}
+function cnFinish(gaveUp){CQ.done=true;const st=gaveUp?1:CQ.mistakes===0?3:CQ.mistakes===1?2:1;
+ G.base.push(st);G.mist+=CQ.mistakes;$('cnInput').disabled=true;
+ if(CQ.t==='read')$('qSlots').querySelectorAll('.opt').forEach(b=>b.disabled=true);
+ let msg='';const ans=CQ.ans?CQ.ans[0]:'';
+ if(gaveUp){msg=CQ.t==='read'?`沒關係！「${CQ.c}」念作「<b class="noz">${ans}</b>」。`:CQ.t==='fill'||CQ.t==='zy'||CQ.t==='blank'?`沒關係！答案是「<b>${ans}</b>」，下次一定記得。`:`沒關係，看看範例：${(CQ.eg||[]).slice(0,3).join('、')}`;sfx('swoop')}
+ else{msg=(CQ.mistakes===0?PRAISE[rnd(0,PRAISE.length-1)]:'答對了，做得好！');sfx('win');$('cnBoard').classList.add('solved');
+  if(CQ.t==='read')msg+=`<br>「${CQ.w}」的「${CQ.c}」念作 <b class="noz">${ans}</b>。`;
+  if(CQ.t==='word'){const others=(CQ.eg||[]).filter(x=>x!==cnNorm($('cnInput').value)).slice(0,3);if(others.length)msg+=`<br>還可以寫：${others.join('、')}`}
+  if(CQ.t==='sent')msg+=`<br>範例：${CQ.eg[0]}`;
+  if(CQ.t==='blank'&&CQ.ans.length>1){const v=cnNorm($('cnInput').value),o=CQ.ans.filter(x=>x!==v);if(o.length)msg+=`<br>也可以寫：${o.join('、')}`}
+  if(CQ.lucky){G.bonus.push(['幸運題答對',1]);msg+='<br>幸運題答對，多拿 <b>1</b> 顆星！'}}
+ if(CQ.t==='read')$('qText').querySelectorAll('.tgt').forEach(e=>{e.classList.remove('noz');e.textContent=e.textContent;zyAnnotate(e)});
+ cnSay(msg,gaveUp?'tip':'good');cnDots();
+ $('cnOk').hidden=true;$('cnHint').hidden=true;$('cnNextBtn').hidden=false;$('cnNextBtn').textContent=G.q+1<CN_N?'下一題 →':'看成績！';$('cnNextBtn').focus()}
+$('cnOk').onclick=cnSubmit;$('cnHint').onclick=cnHint;
+$('cnNextBtn').onclick=()=>{if(G.q+1<CN_N){G.q++;cnNext()}else showDone()};
+$('cnInput').addEventListener('input',()=>{if(CQ&&!CQ.done)cnSlots()});
+$('cnInput').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing&&e.keyCode!==229){e.preventDefault();if(CQ&&CQ.done)$('cnNextBtn').click();else cnSubmit()}});
+$('cnBack').onclick=renderHome;
+$('subjMath').onclick=()=>{S.subj='math';save();renderHome()};$('subjCn').onclick=()=>{S.subj='cn';save();renderHome()};
+function renderCnLevels(){const L=CN_LV();
+ return `<div class="hwtip"><b>怎麼用手寫作答？</b><br>iPad 用 Apple Pencil 可以直接寫在答案框裡（隨手寫）。用手指寫的話，先到「設定 → 一般 → 鍵盤 → 鍵盤 → 新增鍵盤 → 繁體中文 → 手寫」，作答時點鍵盤左下角的地球切換。電腦可以用注音輸入。</div>`+
+ L.map((x,i)=>{const bs=S.best[x.id]||0,b=x.bank;return `<button class="lv" type="button" data-cn="${i}">
+  <div class="lv-top"><span class="tag">${x.boss?'十二課混在一起':'翰林二上'}</span><span class="lv-stars">${[1,2,3].map(k=>starSvg(k<=bs)).join('')}</span></div>
+  <div class="lv-name">${x.name}</div><div class="lv-desc">${b?`習寫字 ${[...b.write].length} 個・認讀字 ${b.read.length} 個`:'填空、注音、認讀、造詞、造句都有'}</div>
+  <div class="lv-top"><span class="mult m${String(x.mult).replace('.','')}">星星 ×${x.mult}</span><span class="tag">過關最多 ${reward(x,3)} ★</span></div></button>`}).join('')}
+
+/* ---------- 注音：所有中文字右側自動加注音 ---------- */
+/* ZYD：單字預設讀音；ZYL：「前一字＋本字」時的讀音；ZYR：「本字＋後一字」時的讀音（由建置程式依台灣讀音產生） */
+const ZYD=/*ZYD*/{"直":"ㄓˊ","式":"ㄕˋ","小":"ㄒㄧㄠˇ","達":"ㄉㄚˊ","人":"ㄖㄣˊ","我":"ㄨㄛˇ","的":"˙ㄉㄜ","星":"ㄒㄧㄥ","按":"ㄢˋ","下":"ㄒㄧㄚˋ","去":"ㄑㄩˋ","抽":"ㄔㄡ","盲":"ㄇㄤˊ","盒":"ㄏㄜˊ","屋":"ㄨ","注":"ㄓㄨˋ","音":"ㄧㄣ","開":"ㄎㄞ","聲":"ㄕㄥ","關":"ㄍㄨㄢ","練":"ㄌㄧㄢˋ","成":"ㄔㄥˊ","高":"ㄍㄠ","手":"ㄕㄡˇ","數":"ㄕㄨˋ","字":"ㄗˋ","對":"ㄉㄨㄟˋ","齊":"ㄑㄧˊ","從":"ㄘㄨㄥˊ","個":"˙ㄍㄜ","位":"ㄨㄟˋ","算":"ㄙㄨㄢˋ","起":"ㄑㄧˇ","滿":"ㄇㄢˇ","進":"ㄐㄧㄣˋ","夠":"ㄍㄡˋ","減":"ㄐㄧㄢˇ","就":"ㄐㄧㄡˋ","借":"ㄐㄧㄝˋ","答":"ㄉㄚˊ","拿":"ㄋㄚˊ","可":"ㄎㄜˇ","以":"ㄧˇ","甜":"ㄊㄧㄢˊ","雲":"ㄩㄣˊ","朵":"ㄉㄨㄛˇ","鎮":"ㄓㄣˋ","公":"ㄍㄨㄥ","仔":"ㄗˇ","還":"ㄏㄞˊ","有":"ㄧㄡˇ","機":"ㄐㄧ","會":"ㄏㄨㄟˋ","到":"ㄉㄠˋ","隱":"ㄧㄣˇ","藏":"ㄘㄤˊ","版":"ㄅㄢˇ","學":"ㄒㄩㄝˊ","加":"ㄐㄧㄚ","國":"ㄍㄨㄛˊ","語":"ㄩˇ","寫":"ㄒㄧㄝˇ","看":"ㄎㄢˋ","挑":"ㄊㄧㄠˇ","戰":"ㄓㄢˋ","模":"ㄇㄛˊ","沒":"ㄇㄟˊ","提":"ㄊㄧˊ","示":"ㄕˋ","和":"ㄏㄢˋ","記":"ㄐㄧˋ","號":"ㄏㄠˋ","錯":"ㄘㄨㄛˋ","只":"ㄓˇ","說":"ㄕㄨㄛ","再":"ㄗㄞˋ","想":"ㄒㄧㄤˇ","每":"ㄇㄟˇ","過":"ㄍㄨㄛˋ","多":"ㄉㄨㄛ","家":"ㄐㄧㄚ","長":"ㄔㄤˊ","放":"ㄈㄤˋ","全":"ㄑㄩㄢˊ","部":"ㄅㄨˋ","卡":"ㄎㄚˇ","怎":"ㄗㄣˇ","麼":"˙ㄇㄜ","備":"ㄅㄟˋ","份":"ㄈㄣˋ","紀":"ㄐㄧˋ","錄":"ㄌㄨˋ","原":"ㄩㄢˊ","清":"ㄑㄧㄥ","除":"ㄔㄨˊ","幸":"ㄒㄧㄥˋ","運":"ㄩㄣˋ","題":"ㄊㄧˊ","案":"ㄢˋ","好":"ㄏㄠˇ","了":"˙ㄌㄜ","櫃":"ㄍㄨㄟˋ","十":"ㄕˊ","百":"ㄅㄞˇ","千":"ㄑㄧㄢ","普":"ㄆㄨˇ","通":"ㄊㄨㄥ","稀":"ㄒㄧ","傳":"ㄔㄨㄢˊ","布":"ㄅㄨˋ","丁":"ㄉㄧㄥ","熊":"ㄒㄩㄥˊ","噗":"ㄆㄨ","林":"ㄌㄧㄣˊ","身":"ㄕㄣ","體":"ㄊㄧˇ","軟":"ㄖㄨㄢˇ","像":"ㄒㄧㄤˋ","剛":"ㄍㄤ","做":"ㄗㄨㄛˋ","戳":"ㄔㄨㄛ","肚":"ㄉㄨˋ","子":"˙ㄗ","癢":"ㄧㄤˇ","喔":"ㄛ","草":"ㄘㄠˇ","莓":"ㄇㄟˊ","兔":"ㄊㄨˋ","住":"ㄓㄨˋ","在":"ㄗㄞˋ","杯":"ㄅㄟ","蛋":"ㄉㄢˋ","糕":"ㄍㄠ","裡":"ㄌㄧˇ","跳":"ㄊㄧㄠˋ","奶":"ㄋㄞˇ","油":"ㄧㄡˊ","要":"ㄧㄠˋ","掉":"ㄉㄧㄠˋ","來":"ㄌㄞˊ","茶":"ㄔㄚˊ","貓":"ㄇㄠ","咪":"ㄇㄧ","露":"ㄌㄨˋ","喜":"ㄒㄧˇ","歡":"ㄏㄨㄢ","泡":"ㄆㄠˋ","睡":"ㄕㄨㄟˋ","午":"ㄨˇ","覺":"ㄐㄧㄠˋ","搔":"ㄙㄠ","巴":"ㄅㄚ","呼":"ㄏㄨ","嚕":"ㄌㄨ","香":"ㄒㄧㄤ","抹":"ㄇㄛˇ","蛙":"ㄨㄚ","綠":"ㄌㄩˋ","坐":"ㄗㄨㄛˋ","碗":"ㄨㄢˇ","澡":"ㄗㄠˇ","呱":"ㄍㄨㄚ","舒":"ㄕㄨ","服":"ㄈㄨˊ","圈":"ㄑㄩㄢ","豬":"ㄓㄨ","桃":"ㄊㄠˊ","套":"ㄊㄠˋ","著":"˙ㄓㄜ","游":"ㄧㄡˊ","泳":"ㄩㄥˇ","滾":"ㄍㄨㄣˇ","司":"ㄙ","鼠":"ㄕㄨˇ","吱":"ㄓ","給":"ㄍㄟˇ","整":"ㄓㄥˇ","間":"ㄐㄧㄢ","房":"ㄈㄤˊ","都":"ㄉㄡ","霜":"ㄕㄨㄤ","淇":"ㄑㄧˊ","淋":"ㄌㄧㄣˊ","狗":"ㄍㄡˇ","蓬":"ㄆㄥˊ","夏":"ㄒㄧㄚˋ","天":"ㄊㄧㄢ","最":"ㄗㄨㄟˋ","受":"ㄕㄡˋ","迎":"ㄧㄥˊ","丟":"ㄉㄧㄡ","骨":"ㄍㄨˇ","頭":"ㄊㄡˊ","汪":"ㄨㄤ","別":"ㄅㄧㄝˊ","讓":"ㄖㄤˋ","融":"ㄖㄨㄥˊ","化":"ㄏㄨㄚˋ","啦":"ㄌㄚ","殼":"ㄎㄜˊ","雞":"ㄐㄧ","啾":"ㄐㄧㄡ","探":"ㄊㄢˋ","出":"ㄔㄨ","餵":"ㄨㄟˋ","米":"ㄇㄧˇ","外":"ㄨㄞˋ","面":"ㄇㄧㄢˋ","亮":"ㄌㄧㄤˋ","棉":"ㄇㄧㄢˊ","花":"ㄏㄨㄚ","糖":"ㄊㄤˊ","羊":"ㄧㄤˊ","咩":"ㄇㄧㄝ","毛":"ㄇㄠˊ","是":"ㄕˋ","口":"ㄎㄡˇ","味":"ㄨㄟˋ","摸":"ㄇㄛ","湯":"ㄊㄤ","圓":"ㄩㄢˊ","冬":"ㄉㄨㄥ","至":"ㄓˋ","忙":"ㄇㄤˊ","牠":"ㄊㄚ","瓜":"ㄍㄨㄚ","塞":"ㄙㄞ","也":"ㄧㄝˇ","蕉":"ㄐㄧㄠ","猴":"ㄏㄡˊ","皮":"ㄆㄧˊ","大":"ㄉㄚˋ","葉":"ㄧㄝˋ","上":"ㄕㄤˋ","曬":"ㄕㄞˋ","太":"ㄊㄞˋ","陽":"ㄧㄤˊ","嗚":"ㄨ","啊":"˙ㄚ","吃":"ㄔ","汽":"ㄑㄧˋ","水":"ㄕㄨㄟˇ","象":"ㄒㄧㄤˋ","啵":"ㄅㄛ","鼻":"ㄅㄧˊ","噴":"ㄆㄣ","泉":"ㄑㄩㄢˊ","雪":"ㄒㄩㄝˇ","冰":"ㄅㄧㄥ","企":"ㄑㄧˋ","鵝":"ㄜˊ","涼":"ㄌㄧㄤˊ","溜":"ㄌㄧㄡ","咻":"ㄒㄧㄡ","飯":"ㄈㄢˋ","糰":"ㄊㄨㄢˊ","竹":"ㄓㄨˊ","野":"ㄧㄝˇ","餐":"ㄘㄢ","定":"ㄉㄧㄥˋ","帶":"ㄉㄞˋ","它":"ㄊㄚ","翻":"ㄈㄢ","跟":"ㄍㄣ","斗":"ㄉㄡˇ","銅":"ㄊㄨㄥˊ","鑼":"ㄌㄨㄛˊ","燒":"ㄕㄠ","狐":"ㄏㄨˊ","床":"ㄔㄨㄤˊ","追":"ㄓㄨㄟ","尾":"ㄨㄟˇ","咦":"ㄧˊ","哪":"ㄋㄚˇ","鷹":"ㄧㄥ","咕":"ㄍㄨ","前":"ㄑㄧㄢˊ","喝":"ㄏㄜ","熱":"ㄖㄜˋ","轉":"ㄓㄨㄢˇ","暖":"ㄋㄨㄢˇ","珍":"ㄓㄣ","無":"ㄨˊ","抱":"ㄅㄠˋ","能":"ㄋㄥˊ","哈":"ㄏㄚ","珠":"ㄓㄨ","鬆":"ㄙㄨㄥ","餅":"ㄅㄧㄥˇ","獅":"ㄕ","吼":"ㄏㄡˇ","鬃":"ㄗㄨㄥ","聞":"ㄨㄣˊ","其":"ㄑㄧˊ","實":"ㄕˊ","蜂":"ㄈㄥ","蜜":"ㄇㄧˋ","虎":"ㄏㄨˇ","妞":"ㄋㄧㄡ","偷":"ㄊㄡ","被":"ㄅㄟˋ","抓":"ㄓㄨㄚ","幾":"ㄐㄧˇ","次":"ㄘˋ","撲":"ㄆㄨ","嗷":"ㄠˊ","浣":"ㄏㄨㄢˋ","洗":"ㄒㄧˇ","浴":"ㄩˋ","搓":"ㄘㄨㄛ","心":"ㄒㄧㄣ","果":"ㄍㄨㄛˇ","凍":"ㄉㄨㄥˋ","章":"ㄓㄤ","魚":"ㄩˊ","變":"ㄅㄧㄢˋ","魔":"ㄇㄛˊ","術":"ㄕㄨˋ","恐":"ㄎㄨㄥˇ","龍":"ㄌㄨㄥˊ","裝":"ㄓㄨㄤ","寶":"ㄅㄠˇ","嘎":"ㄍㄚ","穿":"ㄔㄨㄢ","勇":"ㄩㄥˇ","敢":"ㄍㄢˇ","步":"ㄅㄨˋ","咚":"ㄉㄨㄥ","薄":"ㄅㄛˋ","荷":"ㄏㄜˊ","鯨":"ㄐㄧㄥ","藍":"ㄌㄢˊ","彩":"ㄘㄞˇ","虹":"ㄏㄨㄥˊ","柱":"ㄓㄨˋ","獨":"ㄉㄨˊ","角":"ㄐㄧㄠˇ","獸":"ㄕㄡˋ","那":"ㄋㄚˋ","許":"ㄒㄩˇ","願":"ㄩㄢˋ","你":"ㄋㄧˇ","望":"ㄨㄤˋ","現":"ㄒㄧㄢˋ","鹿":"ㄌㄨˋ","叮":"ㄉㄧㄥ","支":"ㄓ","舞":"ㄨˇ","噹":"ㄉㄤ","火":"ㄏㄨㄛˇ","黃":"ㄏㄨㄤˊ","金":"ㄐㄧㄣ","才":"ㄘㄞˊ","找":"ㄓㄠˇ","得":"˙ㄉㄜ","光":"ㄍㄨㄤ","閃":"ㄕㄢˇ","夜":"ㄧㄝˋ","空":"ㄎㄨㄥ","之":"ㄓ","歌":"ㄍㄜ","囉":"ㄌㄨㄛ","旅":"ㄌㄩˇ","行":"ㄒㄧㄥˊ","喵":"ㄇㄧㄠ","法":"ㄈㄚˇ","圍":"ㄨㄟˊ","巾":"ㄐㄧㄣ","領":"ㄌㄧㄥˇ","結":"ㄐㄧㄝˊ","項":"ㄒㄧㄤˋ","鍊":"ㄌㄧㄢˋ","蝴":"ㄏㄨˊ","蝶":"ㄉㄧㄝˊ","皇":"ㄏㄨㄤˊ","冠":"ㄍㄨㄢ","派":"ㄆㄞˋ","帽":"ㄇㄠˋ","廚":"ㄔㄨˊ","師":"ㄕ","貝":"ㄅㄟˋ","雷":"ㄌㄟˊ","使":"ㄕˇ","環":"ㄏㄨㄢˊ","眼":"ㄧㄢˇ","鏡":"ㄐㄧㄥˋ","墨":"ㄇㄛˋ","耳":"ㄦˇ","棒":"ㄅㄤˋ","英":"ㄧㄥ","雄":"ㄒㄩㄥˊ","披":"ㄆㄧ","風":"ㄈㄥ","習":"ㄒㄧˊ","兩":"ㄌㄧㄤˇ","用":"ㄩㄥˋ","向":"ㄒㄧㄤˋ","相":"ㄒㄧㄤ","三":"ㄙㄢ","見":"ㄐㄧㄢˋ","剩":"ㄕㄥˋ","連":"ㄌㄧㄢˊ","續":"ㄒㄩˋ","王":"ㄨㄤˊ","混":"ㄏㄨㄣˋ","合":"ㄏㄜˊ","所":"ㄙㄨㄛˇ","型":"ㄒㄧㄥˊ","難":"ㄋㄢˊ","新":"ㄒㄧㄣ","鉛":"ㄑㄧㄢ","筆":"ㄅㄧˇ","計":"ㄐㄧˋ","徒":"ㄊㄨˊ","士":"ㄕˋ","木":"ㄇㄨˋ","點":"ㄉㄧㄢˇ","燈":"ㄉㄥ","升":"ㄕㄥ","顆":"ㄎㄜ","存":"ㄘㄨㄣˊ","錢":"ㄑㄧㄢˊ","筒":"ㄊㄨㄥˇ","累":"ㄌㄟˇ","積":"ㄐㄧ","級":"ㄐㄧˊ","為":"ㄨㄟˋ","目":"ㄇㄨˋ","造":"ㄗㄠˋ","句":"ㄐㄩˋ","填":"ㄊㄧㄢˊ","詞":"ㄘˊ","生":"ㄕㄥ","課":"ㄎㄜˋ","樣":"ㄧㄤˋ","第":"ㄉㄧˋ","解":"ㄐㄧㄝˇ","鎖":"ㄙㄨㄛˇ","已":"ㄧˇ","確":"ㄑㄩㄝˋ","這":"ㄓㄜˋ","孩":"ㄏㄞˊ","度":"ㄉㄨˋ","碼":"ㄇㄚˇ","隻":"ㄓ","把":"ㄅㄚˇ","段":"ㄉㄨㄢˋ","文":"ㄨㄣˊ","複":"ㄈㄨˋ","製":"ㄓˋ","自":"ㄗˋ","己":"ㄐㄧˇ","事":"ㄕˋ","本":"ㄅㄣˇ","另":"ㄌㄧㄥˋ","台":"ㄊㄞˊ","電":"ㄉㄧㄢˋ","腦":"ㄋㄠˇ","或":"ㄏㄨㄛˋ","打":"ㄉㄚˇ","遊":"ㄧㄡˊ","戲":"ㄒㄧˋ","貼":"ㄊㄧㄝ","接":"ㄐㄧㄝ","玩":"ㄨㄢˊ","閉":"ㄅㄧˋ","選":"ㄒㄩㄢˇ","取":"ㄑㄩˇ","請":"ㄑㄧㄥˇ","拷":"ㄎㄠˇ","後":"ㄏㄡˋ","置":"ㄓˋ","代":"ㄉㄞˋ","消":"ㄒㄧㄠ","完":"ㄨㄢˊ","正":"ㄓㄥˋ","重":"ㄔㄨㄥˊ","認":"ㄖㄣˋ","評":"ㄆㄧㄥˊ","分":"ㄈㄣ","獎":"ㄐㄧㄤˇ","勵":"ㄌㄧˋ","倍":"ㄅㄟˋ","某":"ㄇㄡˇ","今":"ㄐㄧㄣ","共":"ㄍㄨㄥˋ","價":"ㄐㄧㄚˋ","格":"ㄍㄜˊ","換":"ㄏㄨㄢˋ","比":"ㄅㄧˇ","較":"ㄐㄧㄠˋ","容":"ㄖㄨㄥˊ","易":"ㄧˋ","率":"ㄌㄩˋ","始":"ㄕˇ","中":"ㄓㄨㄥ","知":"ㄓ","道":"ㄉㄠˋ","吧":"˙ㄅㄚ","由":"ㄧㄡˊ","右":"ㄧㄡˋ","往":"ㄨㄤˇ","左":"ㄗㄨㄛˇ","輪":"ㄌㄨㄣˊ","先":"ㄒㄧㄢ","係":"ㄒㄧˋ","們":"˙ㄇㄣ","差":"ㄔㄚˋ","厲":"ㄌㄧˋ","害":"ㄏㄞˋ","漂":"ㄆㄧㄠˋ","讚":"ㄗㄢˋ","四":"ㄙˋ","績":"ㄐㄧˋ","超":"ㄔㄠ","很":"ㄏㄣˇ","少":"ㄕㄠˇ","越":"ㄩㄝˋ","快":"ㄎㄨㄞˋ","回":"ㄏㄨㄟˊ","稱":"ㄔㄥ","繼":"ㄐㄧˋ","庫":"ㄎㄨˋ","翰":"ㄏㄢˋ","二":"ㄦˋ","與":"ㄩˇ","讀":"ㄉㄨˊ","範":"ㄈㄢˋ","例":"ㄌㄧˋ","撰":"ㄓㄨㄢˋ","情":"ㄑㄧㄥˊ","候":"ㄏㄡˋ","颳":"ㄍㄨㄚ","冷":"ㄌㄥˇ","躲":"ㄉㄨㄛˇ","烏":"ㄨ","密":"ㄇㄧˋ","盆":"ㄆㄣˊ","充":"ㄔㄨㄥ","晴":"ㄑㄧㄥˊ","傾":"ㄑㄧㄥ","雨":"ㄩˇ","麗":"ㄌㄧˋ","美":"ㄇㄟˇ","時":"ㄕˊ","撐":"ㄔㄥ","傘":"ㄙㄢˇ","門":"ㄇㄣˊ","早":"ㄗㄠˇ","吹":"ㄔㄨㄟ","陣":"ㄓㄣˋ","突":"ㄊㄨˊ","然":"ㄖㄢˊ","傷":"ㄕㄤ","園":"ㄩㄢˊ","飄":"ㄆㄧㄠ","片":"ㄆㄧㄢˋ","日":"ㄖˋ","樂":"ㄌㄜˋ","停":"ㄊㄧㄥˊ","慢":"ㄇㄢˋ","掛":"ㄍㄨㄚˋ","七":"ㄑㄧ","捉":"ㄓㄨㄛ","迷":"ㄇㄧˊ","弟":"ㄉㄧˋ","白":"ㄅㄞˊ","話":"ㄏㄨㄚˋ","視":"ㄕˋ","意":"ㄧˋ","發":"ㄈㄚ","兒":"˙ㄦ","唱":"ㄔㄤˋ","同":"ㄊㄨㄥˊ","走":"ㄗㄡˇ","色":"ㄙㄜˋ","老":"ㄌㄠˇ","希":"ㄒㄧ","卻":"ㄑㄩㄝˋ","緊":"ㄐㄧㄣˇ","因":"ㄧㄣ","失":"ㄕ","熟":"ㄕㄡˊ","辦":"ㄅㄢˋ","明":"ㄇㄧㄥˊ","氣":"ㄑㄧˋ","鐘":"ㄓㄨㄥ","響":"ㄒㄧㄤˇ","張":"ㄓㄤ","臺":"ㄊㄞˊ","期":"ㄑㄧˊ","嗎":"˙ㄇㄚ","地":"ㄉㄧˋ","跑":"ㄆㄠˇ","賽":"ㄙㄞˋ","媽":"ㄇㄚ","畫":"ㄏㄨㄚˋ","牆":"ㄑㄧㄤˊ","年":"ㄋㄧㄢˊ","衣":"ㄧ","作":"ㄗㄨㄛˋ","久":"ㄐㄧㄡˇ","考":"ㄎㄠˇ","試":"ㄕˋ","件":"ㄐㄧㄢˋ","改":"ㄍㄞˇ","設":"ㄕㄜˋ","方":"ㄈㄤ","享":"ㄒㄧㄤˇ","臣":"ㄔㄣˊ","袖":"ㄒㄧㄡˋ","驚":"ㄐㄧㄥ","愛":"ㄞˋ","西":"ㄒㄧ","買":"ㄇㄞˇ","燙":"ㄊㄤˋ","趕":"ㄍㄢˇ","他":"ㄊㄚ","拉":"ㄌㄚ","姐":"ㄐㄧㄝˇ","教":"ㄐㄧㄠˋ","乾":"ㄍㄢ","鞋":"ㄒㄧㄝˊ","名":"ㄇㄧㄥˊ","形":"ㄒㄧㄥˊ","樹":"ㄕㄨˋ","猜":"ㄘㄞ","靠":"ㄎㄠˋ","近":"ㄐㄧㄣˋ","如":"ㄖㄨˊ","乖":"ㄍㄨㄞ","袋":"ㄉㄞˋ","證":"ㄓㄥˋ","頂":"ㄉㄧㄥˇ","影":"ㄧㄥˇ","蝦":"ㄒㄧㄚ","蟆":"ㄇㄚˊ","擔":"ㄉㄢ","聽":"ㄊㄧㄥ","青":"ㄑㄧㄥ","池":"ㄔˊ","塘":"ㄊㄤˊ","邊":"ㄅㄧㄢ","爐":"ㄌㄨˊ","書":"ㄕㄨ","等":"ㄉㄥˇ","騎":"ㄑㄧˊ","腳":"ㄐㄧㄠˇ","踏":"ㄊㄚˋ","車":"ㄔㄜ","鳥":"ㄋㄧㄠˇ","飛":"ㄈㄟ","東":"ㄉㄨㄥ","謎":"ㄇㄧˊ","附":"ㄈㄨˋ","汁":"ㄓ","山":"ㄕㄢ","特":"ㄊㄜˋ","哥":"ㄍㄜ","彈":"ㄊㄢˊ","琴":"ㄑㄧㄣˊ","牛":"ㄋㄧㄡˊ","五":"ㄨˇ","沙":"ㄕㄚ","灘":"ㄊㄢ","海":"ㄏㄞˇ","退":"ㄊㄨㄟˋ","遠":"ㄩㄢˇ","螃":"ㄆㄤˊ","蟹":"ㄒㄧㄝˋ","夕":"ㄒㄧ","丫":"ㄧㄚ","橫":"ㄏㄥˊ","留":"ㄌㄧㄡˊ","印":"ㄧㄣˋ","挖":"ㄨㄚ","堆":"ㄉㄨㄟ","城":"ㄔㄥˊ","堡":"ㄅㄠˇ","暑":"ㄕㄨˇ","假":"ㄐㄧㄚˋ","校":"ㄒㄧㄠˋ","離":"ㄌㄧˊ","路":"ㄌㄨˋ","趣":"ㄑㄩˋ","馬":"ㄇㄚˇ","傍":"ㄅㄤ","晚":"ㄨㄢˇ","照":"ㄓㄠˋ","紅":"ㄏㄨㄥˊ","洞":"ㄉㄨㄥˋ","土":"ㄊㄨˇ","旁":"ㄆㄤˊ","言":"ㄧㄢˊ","團":"ㄊㄨㄢˊ","六":"ㄌㄧㄡˋ","叢":"ㄘㄨㄥˊ","月":"ㄩㄝˋ","散":"ㄙㄢˋ","溪":"ㄒㄧ","暗":"ㄢˋ","睛":"ㄐㄧㄥ","聚":"ㄐㄩˋ","盡":"ㄐㄧㄣˋ","爸":"ㄅㄚˋ","煮":"ㄓㄨˇ","又":"ㄧㄡˋ","秋":"ㄑㄧㄡ","節":"ㄐㄧㄝˊ","爺":"ㄧㄝˊ","操":"ㄘㄠ","石":"ㄕˊ","森":"ㄙㄣ","淚":"ㄌㄟˋ","粒":"ㄌㄧˋ","真":"ㄓㄣ","食":"ㄕˊ","郊":"ㄐㄧㄠ","便":"ㄅㄧㄢˋ","保":"ㄅㄠˇ","活":"ㄏㄨㄛˊ","奇":"ㄑㄧˊ","當":"ㄉㄤ","平":"ㄆㄧㄥˊ","安":"ㄢ","客":"ㄎㄜˋ","南":"ㄋㄢˊ","祖":"ㄗㄨˇ","艾":"ㄞˋ","粄":"ㄅㄢˇ","捲":"ㄐㄩㄢˇ","春":"ㄔㄨㄣ","幫":"ㄅㄤ","準":"ㄓㄨㄣˇ","祝":"ㄓㄨˋ","動":"ㄉㄨㄥˋ","舉":"ㄐㄩˇ","什":"ㄕㄣˊ","市":"ㄕˋ","鄉":"ㄒㄧㄤ","楚":"ㄔㄨˇ","護":"ㄏㄨˋ","靜":"ㄐㄧㄥˋ","包":"ㄅㄠ","但":"ㄉㄢˋ","八":"ㄅㄚ","介":"ㄐㄧㄝˋ","紙":"ㄓˇ","搶":"ㄑㄧㄤˇ","材":"ㄘㄞˊ","線":"ㄒㄧㄢˋ","各":"ㄍㄜˋ","種":"ㄓㄨㄥˇ","菜":"ㄘㄞˋ","更":"ㄍㄥˋ","紹":"ㄕㄠˋ","盤":"ㄆㄢˊ","棵":"ㄎㄜ","問":"ㄨㄣˋ","場":"ㄔㄤˇ","顏":"ㄧㄢˊ","蔬":"ㄕㄨ","條":"ㄊㄧㄠˊ","船":"ㄔㄨㄢˊ","朋":"ㄆㄥˊ","友":"ㄧㄡˇ","室":"ㄕˋ","九":"ㄐㄧㄡˇ","苔":"ㄊㄞˊ","沖":"ㄔㄨㄥ","蘿":"ㄌㄨㄛˊ","蒸":"ㄓㄥ","蔔":"˙ㄅㄛ","胖":"ㄆㄤˋ","細":"ㄒㄧˋ","淡":"ㄉㄢˋ","黏":"ㄋㄧㄢˊ","妹":"ㄇㄟˋ","理":"ㄌㄧˇ","業":"ㄧㄝˋ","鬧":"ㄋㄠˋ","交":"ㄐㄧㄠ","窗":"ㄔㄨㄤ","具":"ㄐㄩˋ","收":"ㄕㄡ","箱":"ㄒㄧㄤ","搖":"ㄧㄠˊ","表":"ㄅㄧㄠˇ","異":"ㄧˋ","嘴":"ㄗㄨㄟˇ","識":"ㄕˋ","嘟":"ㄉㄨ","遲":"ㄔˊ","歲":"ㄙㄨㄟˋ","朗":"ㄌㄤˇ","球":"ㄑㄧㄡˊ","怪":"ㄍㄨㄞˋ","扇":"ㄕㄢˋ","立":"ㄌㄧˋ","刻":"ㄎㄜˋ","閒":"ㄒㄧㄢˊ","闖":"ㄔㄨㄤˇ","主":"ㄓㄨˇ","播":"ㄅㄛ","報":"ㄅㄠˋ","力":"ㄌㄧˋ","竟":"ㄐㄧㄥˋ","底":"ㄉㄧˇ","慌":"ㄏㄨㄤ","擠":"ㄐㄧˇ","妖":"ㄧㄠ","叫":"ㄐㄧㄠˋ","戶":"ㄏㄨˋ","匹":"ㄆㄧˇ","推":"ㄊㄨㄟ","站":"ㄓㄢˋ","努":"ㄋㄨˇ","排":"ㄆㄞˊ","隊":"ㄉㄨㄟˋ","詠":"ㄩㄥˇ","念":"ㄋㄧㄢˋ","曲":"ㄑㄩ","浮":"ㄈㄨˊ","掌":"ㄓㄤˇ","撥":"ㄅㄛ","波":"ㄅㄛ","詩":"ㄕ","首":"ㄕㄡˇ","指":"ㄓˇ","伸":"ㄕㄣ","脖":"ㄅㄛˊ","倒":"ㄉㄠˋ","背":"ㄅㄟˋ","頸":"ㄐㄧㄥˇ","飽":"ㄅㄠˇ","鴨":"ㄧㄚ","划":"ㄏㄨㄚˋ","童":"ㄊㄨㄥˊ","工":"ㄍㄨㄥ","育":"ㄩˋ","跌":"ㄉㄧㄝ","刷":"ㄕㄨㄚ","牙":"ㄧㄚˊ","臉":"ㄌㄧㄢˇ","誤":"ㄨˋ","調":"ㄉㄧㄠˋ","母":"ㄇㄨˇ","韻":"ㄩㄣˋ","㐀":"ㄑㄧㄡ","鿿":"ㄒㄧㄥˋ","豈":"˙豈","﫿":"˙﫿","括":"ㄎㄨㄛˋ","組":"ㄗㄨˇ","些":"ㄒㄧㄝ","呢":"˙ㄋㄜ","誰":"ㄕㄟˊ","框":"ㄎㄨㄤ","隨":"ㄙㄨㄟˊ","般":"ㄅㄢ","鍵":"ㄐㄧㄢˋ","增":"ㄗㄥ","繁":"ㄈㄢˊ","切":"ㄑㄧㄝˋ","輸":"ㄕㄨ","入":"ㄖㄨˋ","側":"ㄘㄜˋ","單":"ㄉㄢ","預":"ㄩˋ","建":"ㄐㄧㄢˋ","程":"ㄔㄥˊ","依":"ㄧ","灣":"ㄨㄢ","產":"ㄔㄢˇ","值":"ㄓˊ","集":"ㄐㄧˊ","總":"ㄗㄨㄥˇ","哇":"ㄨㄚ","戴":"ㄉㄞˋ","經":"ㄐㄧㄥ"}/*END*/,ZYL=/*ZYL*/{"家長":"ㄓㄤˇ","下巴":"˙ㄅㄚ","骨頭":"˙ㄊㄡ","尾巴":"˙ㄅㄚ","填空":"ㄎㄨㄥˋ","從個":"ㄍㄜˋ","認還":"ㄏㄨㄢˊ","共得":"ㄉㄜˊ","我覺":"ㄐㄩㄝˊ","石頭":"˙ㄊㄡ","成為":"ㄨㄟˊ","豬長":"ㄓㄤˇ","主角":"ㄐㄩㄝˊ","跟頭":"˙ㄊㄡ","指頭":"˙ㄊㄡ","跌倒":"ㄉㄠˇ","生長":"ㄓㄤˇ","成長":"ㄓㄤˇ","班長":"ㄓㄤˇ","校長":"ㄓㄤˇ","部長":"ㄓㄤˇ"}/*END*/,ZYR=/*ZYR*/{"個位":"ㄍㄜˋ","還原":"ㄏㄨㄢˊ","巴在":"˙ㄅㄚ","得到":"ㄉㄜˊ","頭公":"˙ㄊㄡ","空句":"ㄎㄨㄥˋ","空格":"ㄎㄨㄥˋ","覺得":"ㄐㄩㄝˊ","蝦蟆":"ㄏㄚˊ","長得":"ㄓㄤˇ","好奇":"ㄏㄠˋ","種花":"ㄓㄨㄥˋ","數數":"ㄕㄨˇ","長一":"ㄓㄤˇ","沒收":"ㄇㄛˋ","長大":"ㄓㄤˇ","長高":"ㄓㄤˇ","長出":"ㄓㄤˇ","長輩":"ㄓㄤˇ"}/*END*/;
+const HANC=/[㐀-鿿豈-﫿]/;
+const zyTone=r=>!r?1:r.includes('˙')?5:r.includes('ˊ')?2:r.includes('ˇ')?3:r.includes('ˋ')?4:1;
+const ZY_REDUP='爸媽哥姐弟妹奶爺叔伯姑婆公寶星謝娃';
+function zyRead(s){const a=[...s],out=a.map((c,i)=>!HANC.test(c)?null:(ZYL[(a[i-1]||'')+c]||ZYR[c+(a[i+1]||'')]||ZYD[c]||null));
+ a.forEach((c,i)=>{if(c!=='一'&&c!=='不')return;if(ZYL[(a[i-1]||'')+c]||ZYR[c+(a[i+1]||'')])return;
+  const nx=a[i+1],pv=a[i-1];let nt=nx&&HANC.test(nx)?zyTone(out[i+1]):0;if(nt===5&&nx==='個')nt=4;
+  if(c==='一'){if(!nt||'第十'.includes(pv||'x')||nx==='月')out[i]='ㄧ';else if(pv&&pv===nx)out[i]='˙ㄧ';else out[i]=nt===4?'ㄧˊ':'ㄧˋ'}
+  else out[i]=nt===4?'ㄅㄨˊ':'ㄅㄨˋ'});
+ a.forEach((c,i)=>{if(i>0&&a[i-1]===c&&ZY_REDUP.includes(c)&&out[i])out[i]='˙'+out[i].replace(/[ˊˇˋ˙]/g,'')});
+ return out}
+const zyWord=w=>zyRead(w).filter(Boolean).join(' ');
+function zyBox(r){const neu=r.includes('˙'),t=(r.match(/[ˊˇˋ]/)||[''])[0],sy=r.replace(/[ˊˇˋ˙]/g,'');
+ return `<span class="zb" aria-hidden="true">${neu?'<i class="zn">˙</i>':''}<span class="zs">${[...sy].map(x=>`<i>${x}</i>`).join('')}</span>${t?`<i class="zt">${t}</i>`:''}</span>`}
+const ZY_ON=false;
+const ZY_SKIP='script,style,textarea,input,select,option,svg,canvas,title,.noz,.zc,.zybig,.slot-box,.code,.opt';
+function zyText(node){const s=node.nodeValue;if(!s||!HANC.test(s))return;const p=node.parentElement;if(!p||p.closest(ZY_SKIP))return;
+ const rd=zyRead(s),a=[...s];let h='',buf='';
+ const esc=t=>t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+ a.forEach((c,i)=>{if(rd[i]){if(buf){h+=esc(buf);buf=''}h+=`<span class="zc"><span class="zh">${c}</span>${zyBox(rd[i])}</span>`}else buf+=c});
+ if(buf)h+=esc(buf);
+ const t=document.createElement('template');t.innerHTML=h;node.replaceWith(t.content)}
+function zyAnnotate(root){if(!ZY_ON||!root)return;if(root.nodeType===3){if(root.isConnected)zyText(root);return}
+ if(root.nodeType!==1||root.closest&&root.closest(ZY_SKIP))return;
+ const w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT),list=[];let n;while((n=w.nextNode()))list.push(n);list.forEach(x=>{if(x.isConnected)zyText(x)})}
+const zyObs=new MutationObserver(ms=>{for(const m of ms){if(m.type==='characterData')zyAnnotate(m.target);else m.addedNodes.forEach(zyAnnotate)}});
+function zySync(){document.documentElement.classList.toggle('nozy',S.zhuyin===false);$('zyBtn').textContent='注音：'+(S.zhuyin===false?'關':'開')}
+
+
+/* ---------- blind box shop ---------- */
+let shopTab='shop',freshFig=null,gifting=false;
+function openShop(tab){shopTab=tab||shopTab;renderShop();show('shop')}
+$('tabShop').onclick=()=>{shopTab='shop';renderShop()};$('tabShelf').onclick=()=>{shopTab='shelf';renderShop()};
+const rarChip=r=>`<span class="rar rar-${r}">${RAR[r].name}</span>`;
+function renderShop(){const b=bal();syncBal();$('walletN').innerHTML=`${b} ${starSvg()}`;
+ $('tabShop').classList.toggle('on',shopTab==='shop');$('tabShelf').classList.toggle('on',shopTab==='shelf');
+ $('tabShelf').textContent=`我的公仔櫃（${S.owned.length}/${FIGS.length}）`;
+ const left=leftFigs();
+ if(shopTab==='shop'){
+  if(!left.length){$('shopBody').innerHTML=`<div class="empty">全部 ${FIGS.length} 個公仔都升到 Lv3 了！<br>你是真正的公仔大師！</div>`;return}
+  const price=boxPrice(),ok=b>=price,ch=Math.round(hidChance()*100),cnt=r=>left.filter(f=>f.r===r).length,hidLeft=cnt('h');
+  $('shopBody').innerHTML=`<div class="blind">${boxSvg('bbox')}
+   <div class="g-name">甜甜雲朵鎮盲盒</div><div class="g-cost">${starSvg()} ${price}</div>
+   ${ok?`<button class="big" type="button" id="buyBox">抽一個盲盒！</button>`:`<div class="meter"><i style="width:${Math.min(100,b/price*100)}%"></i></div><div class="tag">還差 ${price-b} 顆星，去練習吧！</div>`}
+   <p class="tag" style="margin:12px 0 0">抽到重複的公仔會升級換裝，最高 Lv3！<br>還沒有的公仔比較容易抽到，滿級的公仔不會再出現。</p>
+   <div class="odds">${['n','r','l','h'].map(r=>cnt(r)?`<span class="rar rar-${r}">${RAR[r].name} 可抽 ${cnt(r)} 個</span>`:'').join('')}</div>
+   ${hidLeft?`<div class="luck"><b>幸運值</b>　<span class="tag">下一抽隱藏版機率 ${ch}%</span><div class="meter rainbow"><i style="width:${Math.min(100,S.pity/9*100)}%"></i></div><div class="tag">沒抽到隱藏版，幸運值就會增加；集滿一定抽到！</div></div>`:''}</div>`;
+  if(ok)$('buyBox').onclick=confirmBuy;
+ }else{
+  const own=S.owned.length,lv=shelfLv(),all=!left.length;
+  const slot=f=>{const has=owned(f.id);return `<button class="slot ${has?'':'empty-slot'} ${freshFig===f.id?'new':''}" type="button" ${has?`data-see="${f.id}"`:'disabled'} aria-label="${has?f.name:'還沒收集'}">${plush(f,has?'fig':'fig sil')}<span class="s-name">${has?f.name:'？？？'}</span>${has?`<span class="lvchip l${lvOf(f.id)}">Lv${lvOf(f.id)}</span>`:''}</button>`};
+  const nextLv=[7,14,REG.length].find(n=>regOwned()<n);
+  $('shopBody').innerHTML=`<div class="shelf-head">${all?'<b>全部公仔都升到 Lv3！你是公仔大師！</b>':own?`已收集 <b>${own}</b> / ${FIGS.length} 個公仔・總等級 <b>${FIGS.reduce((t,f)=>t+lvOf(f.id),0)}</b> / ${FIGS.length*3}<br><span class="tag">點公仔看看它會做什麼、下一級會穿什麼</span>`:'公仔櫃還是空的。完成關卡存星星，就能抽第一個盲盒！'}
+    <div class="meter"><i style="width:${own/FIGS.length*100}%"></i></div>${nextLv?`<div class="tag">收集 ${nextLv} 個一般公仔，公仔櫃就會升級</div>`:''}</div>
+   ${['n','r','l'].map(r=>{const fs=REG.filter(f=>f.r===r);return `<div class="shelf l${lv}" style="margin-top:14px"><div class="shelf-name">${rarChip(r)} <span class="tag">${SHELF[lv]}・${fs.filter(f=>owned(f.id)).length}/${fs.length}</span></div>${fs.map(slot).join('')}</div>`}).join('')}
+   <div class="shelf hid"><div class="shelf-name"><span class="rar rar-h">隱藏版</span> <span class="tag">${HID.filter(f=>owned(f.id)).length}/${HID.length}</span></div>${HID.map(slot).join('')}</div>`;
+  freshFig=null;
+  $('shopBody').querySelectorAll('[data-see]').forEach(el=>el.onclick=()=>showFig(el.dataset.see));
+ }
+}
+
+/* ---------- modal ---------- */
+function openModal(html,bind){$('sheet').innerHTML=html;$('modal').hidden=false;bind&&bind();const f=$('sheet').querySelector('button');f&&f.focus()}
+function closeModal(){$('modal').hidden=true;$('sheet').innerHTML=''}
+$('modal').addEventListener('click',e=>{if(e.target===$('modal')&&!gifting)closeModal()});
+
+function pick(list,wf){const tot=list.reduce((s,f)=>s+wf(f),0);let x=Math.random()*tot;for(const f of list){x-=wf(f);if(x<=0)return f}return list[list.length-1]}
+function draw(){const regs=REG.filter(f=>lvOf(f.id)<3),hids=HID.filter(f=>lvOf(f.id)<3),nw=f=>owned(f.id)?1:2;
+ if(hids.length&&Math.random()<hidChance()){S.pity=0;return pick(hids,nw)}
+ if(hids.length)S.pity++;
+ return pick(regs,f=>RAR[f.r].w*nw(f))}
+function confirmBuy(){const b=bal(),c=boxPrice();
+ openModal(`${boxSvg('bbox')}<h3>要抽一個盲盒嗎？</h3><p>用 <b>${c}</b> 顆星，抽完會剩下 <b>${b-c}</b> 顆星。</p>
+  <div class="btns"><button class="big" type="button" id="yesBuy">好，抽！</button><button class="big alt" type="button" id="noBuy">再想想</button></div>`,()=>{
+  $('noBuy').onclick=closeModal;
+  $('yesBuy').onclick=()=>{if(bal()<c||!leftFigs().length){closeModal();return}
+   const lvBefore=shelfLv();S.spent+=c;const f=draw(),L=lvOf(f.id)+1;if(L===1)S.owned.push(f.id);S.lv[f.id]=L;S.boxes++;save();syncBal();openBox(f,lvBefore,L)}});
+}
+function openBox(f,lvBefore,L){gifting=true;const shakes={n:2,r:3,l:4,h:6}[f.r];
+ const lvAfter=shelfLv();
+ openModal(`<h3 id="gTitle">盲盒裡面是……</h3><div class="tap" id="gTap">盒子在動，是誰呢？</div>
+  <div class="gift-stage" id="stage"><div class="rays ${f.r==='h'?'rainbow':''}" style="--ray:${f.r==='l'?'var(--pencil-soft)':f.r==='r'?'var(--good-soft)':'var(--tint)'}"></div>
+   ${boxSvg('box')}
+   <div class="prize ${f.r==='h'?'h':''}">${plush(f,'fig',L)}<div>${rarChip(f.r)} <span class="lvchip l${L}">Lv${L}</span></div><div class="g-name">${f.name}</div></div></div>
+  ${lvAfter>lvBefore?`<p class="note" id="lvUp" hidden>公仔櫃升級成「${SHELF[lvAfter]}」了！</p>`:''}
+  <div class="btns"><button class="big" type="button" id="takeIt" hidden>放進公仔櫃</button></div>`);
+ const st=$('stage'),box=st.querySelector('.box');
+ const done=()=>{st.classList.remove('flash');st.classList.add('open');
+  if(L===1){$('gTitle').textContent=f.r==='h'?'哇！！是隱藏版！':f.r==='l'?'傳說公仔！好幸運！':f.r==='r'?'稀有公仔！':'抽到了新公仔！';$('gTap').textContent=`${f.name}：${f.like}`}
+  else{$('gTitle').textContent=L===3?'升到 Lv3！閃亮完全體！':'重複了！升到 Lv2！';$('gTap').textContent=L===3?`${f.name}戴上了${ACCN[OUT[f.id][1]]}，全身閃閃發光！`:`${f.name}戴上了${ACCN[OUT[f.id][0]]}！再抽到一次就是 Lv3`}
+  if(f.r==='h'){sfx('magic');setTimeout(()=>{sfx('fanfare');confetti();confetti()},300)}else{sfx('fanfare');confetti()}
+  setTimeout(()=>{gifting=false;if(!$('takeIt'))return;$('takeIt').hidden=false;if($('lvUp'))$('lvUp').hidden=false;$('takeIt').focus()},reduced()?0:1100)};
+ $('takeIt').onclick=()=>{closeModal();freshFig=f.id;shopTab='shelf';renderShop()};
+ if(reduced()){done();return}
+ setTimeout(()=>{box.style.animationIterationCount=shakes;st.classList.add('shake');sfx('rattle',shakes*3)},250);
+ const shakeEnd=250+shakes*320;
+ if(f.r==='h'){setTimeout(()=>{st.classList.add('flash');$('gTap').textContent='咦？盒子在發光！';sfx('magic')},shakeEnd);setTimeout(done,shakeEnd+900)}
+ else setTimeout(done,shakeEnd+150);
+}
+function showFig(id){const f=FIGS.find(x=>x.id===id);if(!f)return;const L=lvOf(f.id)||1;
+ openModal(`${rarChip(f.r)} <span class="lvchip l${L}">Lv${L}</span><div class="fig-big" id="figBig">${plush(f,'fig',L)}</div><h3>${f.name}</h3><p id="figSay">${f.like}</p>
+  <div class="lvrow">${[1,2,3].map(l=>`<div class="lvbox ${l<=L?'':'locked'}">${plush(f,l<=L?'fig':'fig sil',l)}<div class="tag">Lv${l}${l>1?'・'+ACCN[OUT[f.id][l-2]]:'・原本的樣子'}</div></div>`).join('')}</div>
+  <p class="tag">${L<3?`再抽到一次${f.name}，就能升到 Lv${L+1}，戴上${ACCN[OUT[f.id][L-1]]}！`:'已經是最高等級 Lv3！'}</p>
+  <div class="btns"><button class="big" type="button" id="hug">${f.btn}</button><button class="big alt" type="button" id="figClose">關閉</button></div>`,()=>{
+  $('figClose').onclick=closeModal;
+  $('hug').onclick=()=>{const w=$('figBig');[...w.classList].filter(c=>c.startsWith('a-')).forEach(c=>w.classList.remove(c));void w.offsetWidth;w.classList.add('a-'+f.act);
+   figSound(f.snd);spawnParts(w,f.pt);const say=$('figSay');say.innerHTML=`<b style="font-family:var(--zh)">「${f.say}」</b>`;say.classList.remove('pop');void say.offsetWidth;say.classList.add('pop')}});
+}
+
+/* ---------- confetti ---------- */
+function confetti(){if(reduced())return;
+ const cv=$('confetti'),x=cv.getContext('2d'),W=cv.width=innerWidth,H=cv.height=innerHeight,cs=getComputedStyle(document.documentElement);
+ const cols=['--pencil','--red','--good','--blue'].map(v=>cs.getPropertyValue(v).trim()).concat(['#F7A8C8','#B9A6F2']);
+ const ps=Array.from({length:150},()=>({x:W/2+(Math.random()-.5)*80,y:H*.4,vx:(Math.random()-.5)*15,vy:-Math.random()*15-4,r:Math.random()*6+4,a:Math.random()*6,va:(Math.random()-.5)*.3,c:cols[rnd(0,cols.length-1)]}));
+ let f=0;(function tick(){x.clearRect(0,0,W,H);ps.forEach(p=>{p.vy+=.35;p.vx*=.99;p.x+=p.vx;p.y+=p.vy;p.a+=p.va;x.save();x.translate(p.x,p.y);x.rotate(p.a);x.fillStyle=p.c;x.fillRect(-p.r/2,-p.r/4,p.r,p.r/2);x.restore()});
+  if(++f<180)requestAnimationFrame(tick);else x.clearRect(0,0,W,H)})();
+}
+
+syncSound();renderHome();
+})();
+</script>
+</body>
+</html>
