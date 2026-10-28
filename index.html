@@ -1664,7 +1664,7 @@ function cnNext(){CQ=Object.assign({mistakes:0,done:false},C.qs[G.q]);CQ.lucky=G
  const intro={fill:'看注音，想一想括號裡要寫什麼字。',blank:'沒有注音喔！讀讀看句子，想一想括號裡可以填什麼語詞。',zy:'把注音寫成國字。',read:'這是認讀字，只要會念就好。點一點正確的注音。',word:`「${CQ.char}」可以組成哪些語詞呢？`,sent:'想一想什麼時候會用到這個語詞，寫成一句話。'}[CQ.t];
  cnSay((CQ.lucky?'幸運題！答對多拿 <b>1</b> 顆星。<br>':'')+intro,CQ.lucky?'tip':'');if(CQ.lucky)sfx('magic');
  $('cnOk').hidden=isRead;$('cnHint').hidden=G.ch||isRead;$('cnNextBtn').hidden=true;cnDots();
- $('hw').hidden=isRead;$('hw').classList.remove('off');$('cnplay').classList.toggle('typing',!!S.cnTyping&&!isRead);hwReset();fitSoon();if(!isRead&&S.cnTyping)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
+ $('hw').hidden=isRead;if(!isRead)setTimeout(hwWarm,300);$('hw').classList.remove('off');$('cnplay').classList.toggle('typing',!!S.cnTyping&&!isRead);hwReset();fitSoon();if(!isRead&&S.cnTyping)setTimeout(()=>{try{inp.focus({preventScroll:true})}catch(e){}},50)}
 function cnPick(btn){if(!CQ||CQ.done)return;const o=CQ.opts[+btn.dataset.o];
  if(o===CQ.ans[0]){btn.classList.add('right');cnFinish(false);return}
  btn.classList.add('wrong');btn.disabled=true;CQ.mistakes++;sfx('bad');foeAtk();
@@ -1727,7 +1727,9 @@ function hwFetch(){const r=hwCv.getBoundingClientRect(),n=HW.strokes.length;
  const body={options:'enable_pre_space',requests:[{writing_guide:{writing_area_width:Math.round(r.width),writing_area_height:Math.round(r.height)},ink,language:'zh_TW',max_num_results:10,max_completions:0}]};
  const p=fetch('https://inputtools.google.com/request?ime=handwriting&app=mobilesearch&cs=1&oe=UTF-8',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)})
   .then(r=>r.json()).then(j=>{const list=(j&&j[0]==='SUCCESS'&&j[1]&&j[1][0]&&j[1][0][1])||[];const seen=new Set(),out=[];
-   for(const c of list){const ch=[...String(c)][0];if(ch&&/[㐀-鿿豈-﫿]/.test(ch)&&!seen.has(ch)){seen.add(ch);out.push(ch)}if(out.length>=6)break}return out});
+   const isH=ch=>!!ch&&/[㐀-鿿豈-﫿]/.test(ch);/* 先收單一個字的候選；Google 把筆畫拆成好幾個字的候選（例如「又臣」）放到最後 */
+   for(const c of list){const a=[...String(c)];if(a.length===1&&isH(a[0])&&!seen.has(a[0])){seen.add(a[0]);out.push(a[0])}}
+   for(const c of list){const ch=[...String(c)][0];if(isH(ch)&&!seen.has(ch)){seen.add(ch);out.push(ch)}}return out.slice(0,10)});
  HW.pending={n,p};return p}
 function hwRecognize(){if(HW.strokes.length)hwFetch().catch(()=>{})}
 function hwMsg(t){$('hwCands').innerHTML=`<span class="hw-msg">${t}</span>`}
@@ -1749,27 +1751,35 @@ function hwDist(m){const N=HWN,D=new Float32Array(N*N),INF=1e6;for(let i=0;i<N*N
 const hwMedCache={};
 function hwMedOf(ch){if(!HWMED[ch])return null;if(hwMedCache[ch])return hwMedCache[ch];const st=HWMED[ch].split(';').map(s=>{const a=s.split(',').map(Number),o=[];for(let i=0;i<a.length;i+=2)o.push([a[i],a[i+1]]);return o});
  const m=hwRaster(st);return hwMedCache[ch]=m&&{m,D:hwDist(m)}}
-function hwScore(ch){try{return hwScore0(ch)}catch(e){return null}}
-function hwScore0(ch){const ref=hwMedOf(ch);if(!ref)return null;const kid=hwRaster(HW.strokes.map(st=>st.x.map((x,i)=>[x,st.y[i]])));if(!kid)return null;const KD=hwDist(kid);
- let a=0,na=0,b=0,nb=0;for(let i=0;i<kid.length;i++){if(kid[i]){a+=ref.D[i];na++}if(ref.m[i]){b+=KD[i];nb++}}return na&&nb?(a/na+b/nb)/2:null}
-
-function hwPickOld(list){if(!list.length)return null;const v=[...cnNorm($('cnInput').value)],pos=v.length,top=list.slice(0,3);let want=[];
- if(CQ.ans&&CQ.t!=='read')want=CQ.ans.map(a=>[...a][pos]).filter(Boolean);
- if(CQ.t==='word'&&!v.includes(CQ.char))want.push(CQ.char);
- if(CQ.t==='sent')want=[...CQ.w];
- return top.find(c=>want.includes(c))||list[0]}
-/* 挑字規則：
-   1. 辨識前 5 名有該寫的字 → 算寫對
-   2. 不在前 5 名，但字形跟該寫的字夠像（距離 ≤ 0.8）→ 算寫對；除非辨識第 1 名是別的字、而且字形更像那個字
-   3. 其他 → 用辨識第 1 名（寫錯的字） */
+function hwKid(){try{const m=hwRaster(HW.strokes.map(st=>st.x.map((x,i)=>[x,st.y[i]])));return m?{m,D:hwDist(m)}:null}catch(e){return null}}
+function hwSc(kid,ch){try{const ref=hwMedOf(ch);if(!ref||!kid)return null;let a=0,na=0,b=0,nb=0;const km=kid.m;
+ for(let i=0;i<km.length;i++){if(km[i]){a+=ref.D[i];na++}if(ref.m[i]){b+=kid.D[i];nb++}}return na&&nb?(a/na+b/nb)/2:null}catch(e){return null}}
+function hwScore(ch){return hwSc(hwKid(),ch)}
+/* 背景先把題庫的字形算好，按「下一個字」時就不用等 */
+let hwWarmQ=null;function hwWarm(){if(hwWarmQ)return;hwWarmQ=Object.keys(HWMED);(function step(){const t=performance.now();while(hwWarmQ.length&&performance.now()-t<12){try{hwMedOf(hwWarmQ.pop())}catch(e){}}if(hwWarmQ.length)setTimeout(step,30)})()}
+/* 挑字規則（v3）：
+   1. 這一格有標準答案時：Google 前 5 名有答案、或字形跟答案夠像（≤0.85）→ 算寫對；
+      除非別的字（Google 前 10 名或題庫字）字形明顯更像 → 那就是寫成別的字了。
+   2. 自由書寫的字（造詞、造句）：把 Google 前 10 名和題庫 588 字都拿來比字形，
+      Google 排名越前面加分越多，選總分最好的字。 */
+const HW_RANK_BONUS=[.28,.2,.16,.13,.1,.08,.06,.05,.04,.03];
 function hwPick(list){const v=[...cnNorm($('cnInput').value)],pos=v.length;let want=[];
  if(CQ.ans&&CQ.t!=='read')want=CQ.ans.map(a=>[...a][pos]).filter(Boolean);
  if(CQ.t==='word'&&!v.includes(CQ.char))want.push(CQ.char);
  if(CQ.t==='sent')want=[...CQ.w];
- const top=list.slice(0,5);const hit=top.find(c=>want.includes(c));if(hit)return hit;
- let best=null,bs=9;for(const w of new Set(want)){const sc=hwScore(w);if(sc!=null&&sc<bs){bs=sc;best=w}}
- if(best&&bs<=.8){const t1=list[0];if(t1&&t1!==best){const s1=hwScore(t1);if(s1!=null&&s1<bs-.1)return t1}return best}
- return list[0]||null}
+ const kid=hwKid(),top10=list.slice(0,10);
+ const total=c=>{const sc=hwSc(kid,c);if(sc==null)return null;const r=top10.indexOf(c);return sc-(r>=0?HW_RANK_BONUS[r]:0)};
+ let best=null,bt=9;const consider=c=>{if(c===best)return;const t=total(c);if(t!=null&&t<bt){bt=t;best=c}};
+ top10.forEach(consider);for(const c in HWMED)consider(c);
+ if(want.length){const top5=list.slice(0,5),hit=top5.find(c=>want.includes(c));
+  let w=null,ws=9;for(const c of new Set(want)){const sc=hwSc(kid,c);if(sc!=null&&sc<ws){ws=sc;w=c}}
+  const wt=w?ws-(top10.indexOf(w)>=0?HW_RANK_BONUS[top10.indexOf(w)]:0):9;
+  if(hit&&!(best&&best!==hit&&bt<wt-.15))return hit;
+  if(w&&ws<=.85&&!(best&&best!==w&&bt<wt-.15))return w}
+ const t1=list[0];
+ if(t1&&!HWMED[t1]&&(!best||bt>.55))return t1;  /* 題庫沒有的字，相信 Google */
+ if(best&&(bt<.9||!t1))return best;
+ return t1||null}
 async function hwCommitPending(){if(!HW.strokes.length)return true;if(HW.busy)return false;HW.busy=true;hwMsg('認字中…');
  try{const list=await(HW.pending&&HW.pending.n===HW.strokes.length?HW.pending.p:hwFetch());const ch=hwPick(list);
   if(!ch){hwMsg('看不出來是哪個字，按「重寫這個字」再寫清楚一點');return false}hwCommit(ch);return true}
