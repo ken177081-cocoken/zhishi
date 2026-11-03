@@ -1771,6 +1771,7 @@ function hwPick(list){const v=[...cnNorm($('cnInput').value)],pos=v.length;let w
  const total=c=>{const sc=hwSc(kid,c);if(sc==null)return null;const r=top10.indexOf(c);return sc-(r>=0?HW_RANK_BONUS[r]:0)};
  let best=null,bt=9;const consider=c=>{if(c===best)return;const t=total(c);if(t!=null&&t<bt){bt=t;best=c}};
  top10.forEach(consider);for(const c in HWMED)consider(c);
+ try{const sh=[];for(const c in HWMED){const v=hwSc(kid,c);if(v!=null)sh.push([c,v])}sh.sort((a,b)=>a[1]-b[1]);HW.dbg=`Google：${top10.join(' ')||'（沒有）'}｜字形最像：${sh.slice(0,5).map(x=>x[0]+x[1].toFixed(2)).join(' ')}｜選：${best||'-'}${best?bt.toFixed(2):''}`}catch(e){HW.dbg='（無法計算字形）'}
  if(want.length){const top5=list.slice(0,5),hit=top5.find(c=>want.includes(c));
   let w=null,ws=9;for(const c of new Set(want)){const sc=hwSc(kid,c);if(sc!=null&&sc<ws){ws=sc;w=c}}
   const wt=w?ws-(top10.indexOf(w)>=0?HW_RANK_BONUS[top10.indexOf(w)]:0):9;
@@ -1784,9 +1785,10 @@ async function hwCommitPending(){if(!HW.strokes.length)return true;if(HW.busy)re
  try{const list=await(HW.pending&&HW.pending.n===HW.strokes.length?HW.pending.p:hwFetch());const ch=hwPick(list);
   if(!ch){hwMsg('看不出來是哪個字，按「重寫這個字」再寫清楚一點');return false}hwCommit(ch);return true}
  catch(e){const ch=hwPick([]);if(ch){hwCommit(ch);return true}hwMsg('需要網路才能認字，請檢查網路，或按「改用打字」');return false}finally{HW.busy=false}}
-function hwCommit(ch){if(!CQ||CQ.done||!ch)return;const inp=$('cnInput');inp.value=(inp.value||'')+ch;HW.strokes=[];HW.cur=null;HW.pending=null;hwRedraw();hwShowCands();playA('ui_tap');cnSlots()}
+function hwCommit(ch){if(!CQ||CQ.done||!ch)return;HW.lastDbg=(HW.dbg||'')+`→ 填入「${ch}」`;HW.dbg='';const inp=$('cnInput');inp.value=(inp.value||'')+ch;HW.strokes=[];HW.cur=null;HW.pending=null;hwRedraw();hwShowCands();playA('ui_tap');cnSlots()}
 function hwReset(){HW.strokes=[];HW.cur=null;HW.pending=null;HW.busy=false;clearTimeout(HW.timer);hwRedraw();hwShowCands();requestAnimationFrame(hwSize)}
 $('hwNext').onclick=()=>hwCommitPending();
+let hwTap=0,hwTapT=0;$('hwCands').addEventListener('click',()=>{const n=Date.now();hwTap=n-hwTapT<600?hwTap+1:1;hwTapT=n;if(hwTap>=3){hwTap=0;hwMsg(`<span style="font-size:12px;color:#8A715C">${HW.lastDbg||'還沒有判斷紀錄'}</span>`)}});
 $('hwUndo').onclick=()=>{HW.strokes.pop();hwRedraw();clearTimeout(HW.timer);HW.timer=setTimeout(hwRecognize,150)};
 $('hwClear').onclick=()=>{HW.strokes=[];HW.pending=null;hwRedraw();hwShowCands()};
 $('hwBack').onclick=()=>{if(HW.strokes.length){HW.strokes=[];HW.pending=null;hwRedraw();hwShowCands();return}const inp=$('cnInput');inp.value=[...inp.value].slice(0,-1).join('');cnSlots()};
