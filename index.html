@@ -1763,24 +1763,25 @@ let hwWarmQ=null;function hwWarm(){if(hwWarmQ)return;hwWarmQ=Object.keys(HWMED);
    2. 自由書寫的字（造詞、造句）：把 Google 前 10 名和題庫 588 字都拿來比字形，
       Google 排名越前面加分越多，選總分最好的字。 */
 const HW_RANK_BONUS=[.28,.2,.16,.13,.1,.08,.06,.05,.04,.03];
+/* 挑字規則（v4，依實際孩子手寫調整）：Google 的第 1 名最可靠，字形比對只用來「確認是不是正確答案」
+   1. 這一格有標準答案：Google 前 5 名有答案 → 寫對
+      或字形跟答案夠像（≤0.85），而且不比 Google 第 1 名的字形差太多 → 寫對（救回 Google 認不出的複雜字）
+   2. 其他 → 用 Google 第 1 名（孩子寫的是別的字，就照實填入）
+   3. 沒網路：只有字形跟答案很像才填答案，否則請孩子重寫 */
 function hwPick(list){const v=[...cnNorm($('cnInput').value)],pos=v.length;let want=[];
  if(CQ.ans&&CQ.t!=='read')want=CQ.ans.map(a=>[...a][pos]).filter(Boolean);
  if(CQ.t==='word'&&!v.includes(CQ.char))want.push(CQ.char);
  if(CQ.t==='sent')want=[...CQ.w];
- const kid=hwKid(),top10=list.slice(0,10);
- const total=c=>{const sc=hwSc(kid,c);if(sc==null)return null;const r=top10.indexOf(c);return sc-(r>=0?HW_RANK_BONUS[r]:0)};
- let best=null,bt=9;const consider=c=>{if(c===best)return;const t=total(c);if(t!=null&&t<bt){bt=t;best=c}};
- top10.forEach(consider);for(const c in HWMED)consider(c);
- try{const sh=[];for(const c in HWMED){const v=hwSc(kid,c);if(v!=null)sh.push([c,v])}sh.sort((a,b)=>a[1]-b[1]);HW.dbg=`Google：${top10.join(' ')||'（沒有）'}｜字形最像：${sh.slice(0,5).map(x=>x[0]+x[1].toFixed(2)).join(' ')}｜選：${best||'-'}${best?bt.toFixed(2):''}`}catch(e){HW.dbg='（無法計算字形）'}
- if(want.length){const top5=list.slice(0,5),hit=top5.find(c=>want.includes(c));
-  let w=null,ws=9;for(const c of new Set(want)){const sc=hwSc(kid,c);if(sc!=null&&sc<ws){ws=sc;w=c}}
-  const wt=w?ws-(top10.indexOf(w)>=0?HW_RANK_BONUS[top10.indexOf(w)]:0):9;
-  if(hit&&!(best&&best!==hit&&bt<wt-.15))return hit;
-  if(w&&ws<=.85&&!(best&&best!==w&&bt<wt-.15))return w}
- const t1=list[0];
- if(t1&&!HWMED[t1]&&(!best||bt>.55))return t1;  /* 題庫沒有的字，相信 Google */
- if(best&&(bt<.9||!t1))return best;
- return t1||null}
+ const kid=hwKid(),t1=list[0]||null,s1=t1?hwSc(kid,t1):null;
+ let w=null,ws=9;for(const c of new Set(want)){const sc=hwSc(kid,c);if(sc!=null&&sc<ws){ws=sc;w=c}}
+ const hit=list.slice(0,5).find(c=>want.includes(c));
+ let pick=null,why='';
+ if(hit){pick=hit;why='Google 前5名有答案'}
+ else if(w&&ws<=.85&&(s1==null||ws<=s1+.1)){pick=w;why='字形像答案'}
+ else if(t1){pick=t1;why='Google 第1名'}
+ else if(w&&ws<=.6){pick=w;why='離線字形像答案'}
+ HW.dbg=`Google：${list.slice(0,6).join(' ')||'（沒有）'}｜答案「${want.join('')||'-'}」字形${w?ws.toFixed(2):'-'}｜第1名字形${s1!=null?s1.toFixed(2):'-'}｜${why||'無法判斷'}`;
+ return pick}
 async function hwCommitPending(){if(!HW.strokes.length)return true;if(HW.busy)return false;HW.busy=true;hwMsg('認字中…');
  try{const list=await(HW.pending&&HW.pending.n===HW.strokes.length?HW.pending.p:hwFetch());const ch=hwPick(list);
   if(!ch){hwMsg('看不出來是哪個字，按「重寫這個字」再寫清楚一點');return false}hwCommit(ch);return true}
